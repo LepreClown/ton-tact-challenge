@@ -1,6 +1,5 @@
 import "@stdlib/deploy";
 import "@stdlib/ownable";
-
 /*
  TASK 2 - Proxy
   Create a contract that forwards all received TONs
@@ -37,11 +36,11 @@ contract Task2 with Deployable, Ownable {
     }
 
     receive(msg: Slice){
+        let message: Slice = msg;
         let sender: Address = sender();
         let address: Address = self.admin;
         send(SendParameters{to: address,
                 value: 0,
-                body: BodyContext{ctx: msg, sender: sender}.toCell(),
                 mode: SendRemainingBalance + SendIgnoreErrors
             }
         );
