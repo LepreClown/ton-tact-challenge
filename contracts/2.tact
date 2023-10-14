@@ -1,6 +1,5 @@
 import "@stdlib/deploy";
 import "@stdlib/ownable";
-
 /*
  TASK 2 - Proxy
   Create a contract that forwards all received TONs
@@ -18,7 +17,7 @@ message(0x44) Refund {
     queryId: Int as uint64;
     sender: Address;
 }
-message BodyContext {
+message BodyMessage {
     sender: Address;
     ctx: Slice;
 }
@@ -34,18 +33,22 @@ contract Task2 with Deployable, Ownable {
     receive(msg: Refund){
         self.requireOwner();
         require(msg.queryId >= 0, "User not found");
-        // send(SendParameters{to: msg.sender, bounce: true, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
+        send(SendParameters{to: msg.sender,
+                bounce: true,
+                value: context().value,
+                mode: SendRemainingValue + SendIgnoreErrors
+            }
+        );
     }
 
     receive(msg: Slice){
-        let message: Slice = msg;
         let sender: Address = sender();
         let address: Address = self.admin;
-        // send(SendParameters{to: address,
-        //         value: 0,
-        //         body: "sender".asComment(),
-        //         mode: SendRemainingBalance + SendIgnoreErrors
-        //     }
-        // );
+        send(SendParameters{to: address,
+                value: context().value,
+                body: BodyMessage{sender: sender(), ctx: msg}.toCell(),
+                mode: SendRemainingValue + SendIgnoreErrors
+            }
+        );
     }
 }
