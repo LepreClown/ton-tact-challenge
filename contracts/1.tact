@@ -18,6 +18,7 @@ message Subtract {
 
 contract Task1 with Deployable {
     counter: Int as int32;
+
     init(){
         self.counter = 0;
     }
