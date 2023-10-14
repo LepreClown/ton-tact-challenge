@@ -1,7 +1,8 @@
+
 import "@stdlib/deploy";
 
 /*
-  TASK 2 - Proxy 
+ TASK 2 - Proxy
   Create a contract that forwards all received TONs
   to the admin contract (whose address is set in init_store).
   Message from this proxy contract to the admin contract should contain:
@@ -14,20 +15,43 @@ import "@stdlib/deploy";
 */
 
 message(0x44) Refund {
-  queryId: Int as uint64;
-  sender: Address;
+    queryId: Int as uint64;
+    sender: Address;
+}
+message BodyContext {
+    sender: Address;
+    message: Slice;
 }
 
 contract Task2 with Deployable {
-  admin: Address;
+    admin: Address;
+    sender: Address;
+    init(admin: Address){
+        self.admin = admin;
+        self.sender = sender();
+       
+    }
 
-  init(admin: Address) {
-    self.admin = admin;
-  }
-  
-  receive(msg: Refund) {
-  }
+    receive(msg: Refund){
+      require(self.admin == msg.sender, "Not corect admin address");
+      send(SendParameters{
+              to: msg.sender,
+              value: 0,
+              mode: SendRemainingBalance + SendIgnoreErrors
+            }
+        );
+    }
 
-  receive(msg: Slice) {
-  }
+    receive(msg: Slice){
+        let sender: Address = sender();
+        let address: Address = self.admin;
+
+        send(SendParameters{
+                to: address,
+                body: BodyContext{message: msg, sender: sender}.toCell(),
+                value: 0,
+                mode: SendRemainingBalance + SendIgnoreErrors
+            }
+        );
+    }
 }
