@@ -1,6 +1,4 @@
-
 import "@stdlib/deploy";
-
 /*
  TASK 2 - Proxy
   Create a contract that forwards all received TONs
@@ -20,36 +18,26 @@ message(0x44) Refund {
 }
 message BodyContext {
     sender: Address;
-    message: Slice;
+    ctx: Slice;
 }
 
 contract Task2 with Deployable {
     admin: Address;
-    sender: Address;
     init(admin: Address){
         self.admin = admin;
-        self.sender = sender();
-       
     }
 
     receive(msg: Refund){
-      require(self.admin == msg.sender, "Not corect admin address");
-      send(SendParameters{
-              to: msg.sender,
-              value: 0,
-              mode: SendRemainingBalance + SendIgnoreErrors
-            }
-        );
+        require(self.admin == msg.sender, "Only admin can call this message");
+        send(SendParameters{to: msg.sender, bounce: true, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
     }
 
     receive(msg: Slice){
         let sender: Address = sender();
         let address: Address = self.admin;
-
-        send(SendParameters{
-                to: address,
-                body: BodyContext{message: msg, sender: sender}.toCell(),
+        send(SendParameters{to: address,
                 value: 0,
+                body: BodyContext{ctx: msg, sender: sender}.toCell(),
                 mode: SendRemainingBalance + SendIgnoreErrors
             }
         );
