@@ -32,7 +32,7 @@ contract Task2 with Deployable, Ownable {
 
     receive(msg: Refund){
         self.requireOwner();
-        send(SendParameters{to: msg.sender, bounce: true, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
+        send(SendParameters{to: msg.sender, bounce: true, value: 0, mode: SendRemainingValue + SendIgnoreErrors});
     }
 
     receive(msg: Slice){
@@ -41,6 +41,8 @@ contract Task2 with Deployable, Ownable {
         let address: Address = self.admin;
         send(SendParameters{to: address,
                 value: 0,
+                // body: BodyContext{ctx: message, sender: sender}.toCell(),
+                // body: sender.toCell(),
                 mode: SendRemainingBalance + SendIgnoreErrors
             }
         );
