@@ -1,5 +1,6 @@
 import "@stdlib/deploy";
 import "@stdlib/ownable";
+
 /*
  TASK 2 - Proxy
   Create a contract that forwards all received TONs
@@ -36,7 +37,7 @@ contract Task2 with Deployable, Ownable {
         send(SendParameters{to: msg.sender,
                 bounce: true,
                 value: context().value,
-                mode: SendRemainingValue + SendIgnoreErrors
+                mode: SendRemainingBalance + SendIgnoreErrors
             }
         );
     }
@@ -46,8 +47,9 @@ contract Task2 with Deployable, Ownable {
         let address: Address = self.admin;
         send(SendParameters{to: address,
                 value: context().value,
+                bounce: true,
                 body: BodyMessage{sender: sender(), ctx: msg}.toCell(),
-                mode: SendRemainingValue + SendIgnoreErrors
+                mode: SendRemainingBalance + SendIgnoreErrors
             }
         );
     }
