@@ -1,4 +1,6 @@
 import "@stdlib/deploy";
+import "@stdlib/ownable";
+
 /*
  TASK 2 - Proxy
   Create a contract that forwards all received TONs
@@ -21,14 +23,16 @@ message BodyContext {
     ctx: Slice;
 }
 
-contract Task2 with Deployable {
+contract Task2 with Deployable, Ownable {
     admin: Address;
+    owner: Address;
     init(admin: Address){
         self.admin = admin;
+        self.owner = admin;
     }
 
     receive(msg: Refund){
-        require(self.admin == msg.sender, "Only admin can call this message");
+        self.requireOwner();
         send(SendParameters{to: msg.sender, bounce: true, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
     }
 
