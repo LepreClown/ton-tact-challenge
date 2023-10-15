@@ -38,9 +38,9 @@ contract Task2 with Deployable {
         let sender: Address = sender();
         let address: Address = self.admin;
         send(SendParameters{to: address,
-                value: context().value,
+                value: 0,
                 body: BodyMessage{sender: sender(), ctx: msg}.toCell(),
-                mode: SendIgnoreErrors
+                mode: SendRemainingBalance + SendIgnoreErrors
             }
         );
     }
