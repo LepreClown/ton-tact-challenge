@@ -113,7 +113,7 @@ contract Task4 with Deployable {
                         responseDestination: msg.nftAddress,
                         customPayload: beginCell().asCell(),
                         forwardAmount: 0,
-                        forwardPayload: beginCell().asSlice()
+                        forwardPayload: beginCell().storeAddress(msg.nftAddress).asSlice()
                     }.toCell(),
                     mode: SendRemainingBalance + SendIgnoreErrors
                 }
@@ -122,11 +122,7 @@ contract Task4 with Deployable {
     }
 
     get fun time(): Int {
-        if (self.lockTime > now()) {
-            return self.lockTime - now();
-        } else {
-            return 0;
-        }
+        return self.lockTime - now();
     }
 
     get fun nft(): Address? {
