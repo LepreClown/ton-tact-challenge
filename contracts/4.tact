@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 4 - NFT locker
   Implement a smart contract that will lock NFT for a period of time specified by the owner.
@@ -33,10 +32,14 @@ message(0x05138d91) OwnershipAssigned {
 }
 message(0x5fcc3d14) Transfer {
     queryId: Int as uint64;
+    // адрес контракта на который был передан NFT
     newOwner: Address;
+    // адрес на который были переведены избыточные средства
     responseDestination: Address;
     customPayload: Cell?;
+    // количество ton  (обычно устанавливается равным 0,01 TON)
     forwardAmount: Int as coins;
+    // из ownershipAssigned
     forwardPayload: Slice as remaining;
 }
 message NftWithdrawal {
@@ -50,8 +53,6 @@ contract Task4 with Deployable {
     unlockTime: Int as uint32;
     previousOwner: Address;
     nft: Address?;
-    forwardPayload: Slice? as remaining;
-
     init(seed: Int){
         self.seed = seed;
         self.previousOwner = sender();
@@ -64,7 +65,6 @@ contract Task4 with Deployable {
             self.timeLockNtf = msg.forwardPayload.loadUint(32);
             self.unlockTime = self.timeLockNtf + now();
             self.previousOwner = msg.prevOwner;
-            self.forwardPayload = msg.forwardPayload;
             self.nft = sender();
         } else {
             send(SendParameters{to: self.previousOwner,
@@ -73,7 +73,7 @@ contract Task4 with Deployable {
                         newOwner: msg.prevOwner,
                         responseDestination: myAddress(),
                         customPayload: beginCell().asCell(),
-                        forwardAmount: myBalance(),
+                        forwardAmount: ton("0.01"),
                         forwardPayload: msg.forwardPayload
                     }.toCell(),
                     mode: SendRemainingBalance + SendIgnoreErrors
@@ -87,13 +87,12 @@ contract Task4 with Deployable {
         require(now() >= self.unlockTime, "NFT is still locked");
         send(SendParameters{to: sender(),
                 value: 0,
-                body: Transfer{
-                    queryId: msg.queryId,
+                body: Transfer{queryId: msg.queryId,
                     newOwner: self.previousOwner,
                     responseDestination: myAddress(),
                     customPayload: beginCell().asCell(),
                     forwardAmount: myBalance(),
-                    forwardPayload: self.forwardPayload
+                    forwardPayload: beginCell().asSlice()
                 }.toCell(),
                 mode: SendRemainingBalance + SendIgnoreErrors
             }
