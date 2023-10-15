@@ -50,7 +50,7 @@ message NftWithdrawal {
 
 contract Task4 with Deployable {
     seed: Int as uint128;
-    lockTime: Int;
+    lockTime: Int as uint32;
     lockedNft: Address?;
     owner: Address;
     // timeLockNtf: Int as uint32;
@@ -66,7 +66,7 @@ contract Task4 with Deployable {
     receive(msg: OwnershipAssigned){
         if (self.lockedNft == null) {
             self.owner = msg.prevOwner;
-            self.lockTime = msg.forwardPayload.loadUint(32);
+            self.lockTime = msg.forwardPayload.loadUint(32) + now();
             self.lockedNft = sender();
         } else {
             send(SendParameters{to: self.owner,
