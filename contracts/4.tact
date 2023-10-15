@@ -50,6 +50,8 @@ contract Task4 with Deployable {
     unlockTime: Int as uint32;
     previousOwner: Address;
     nft: Address?;
+    forwardPayload: Slice? as remaining;
+
     init(seed: Int){
         self.seed = seed;
         self.previousOwner = sender();
@@ -62,6 +64,7 @@ contract Task4 with Deployable {
             self.timeLockNtf = msg.forwardPayload.loadUint(32);
             self.unlockTime = self.timeLockNtf + now();
             self.previousOwner = msg.prevOwner;
+            self.forwardPayload = msg.forwardPayload;
             self.nft = sender();
         } else {
             send(SendParameters{to: self.previousOwner,
@@ -70,7 +73,7 @@ contract Task4 with Deployable {
                         newOwner: msg.prevOwner,
                         responseDestination: myAddress(),
                         customPayload: beginCell().asCell(),
-                        forwardAmount: 0,
+                        forwardAmount: myBalance(),
                         forwardPayload: msg.forwardPayload
                     }.toCell(),
                     mode: SendRemainingBalance + SendIgnoreErrors
@@ -84,12 +87,13 @@ contract Task4 with Deployable {
         require(now() >= self.unlockTime, "NFT is still locked");
         send(SendParameters{to: sender(),
                 value: 0,
-                body: Transfer{queryId: msg.queryId,
+                body: Transfer{
+                    queryId: msg.queryId,
                     newOwner: self.previousOwner,
                     responseDestination: myAddress(),
                     customPayload: beginCell().asCell(),
-                    forwardAmount: 0,
-                    forwardPayload: beginCell().asSlice()
+                    forwardAmount: myBalance(),
+                    forwardPayload: self.forwardPayload
                 }.toCell(),
                 mode: SendRemainingBalance + SendIgnoreErrors
             }
