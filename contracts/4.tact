@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 4 - NFT locker
   Implement a smart contract that will lock NFT for a period of time specified by the owner.
@@ -66,7 +67,7 @@ contract Task4 with Deployable {
         } else {
             send(SendParameters{to: self.owner,
                     value: 0,
-                    body: Transfer{queryId: 0,
+                    body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
                         responseDestination: myAddress(),
                         customPayload: beginCell().asCell(),
@@ -81,35 +82,21 @@ contract Task4 with Deployable {
 
     receive(msg: NftWithdrawal){
         require(self.owner == sender(), "Invalid sender");
-        require(msg.nftAddress == self.lockedNft, "Invalid NFT address");
-        require(msg.queryId == 0, "Invalid query ID");
-        if (now() >= self.lockTime) {
-            send(SendParameters{to: sender(),
-                    value: 0,
-                    body: Transfer{queryId: 0,
-                        newOwner: self.owner,
-                        responseDestination: msg.nftAddress,
-                        customPayload: emptyCell(),
-                        forwardAmount: 0,
-                        forwardPayload: emptySlice()
-                    }.toCell(),
-                    mode: SendRemainingBalance + SendIgnoreErrors
-                }
-            );
-        } else {
-            send(SendParameters{to: sender(),
-                    value: 0,
-                    body: Transfer{queryId: 0,
-                        newOwner: msg.nftAddress,
-                        responseDestination: msg.nftAddress,
-                        customPayload: emptyCell(),
-                        forwardAmount: 0,
-                        forwardPayload: emptySlice()
-                    }.toCell(),
-                    mode: SendRemainingBalance + SendIgnoreErrors
-                }
-            );
-        }
+        // require(msg.nftAddress == self.lockedNft, "Invalid NFT address");
+        // require(msg.queryId == 0, "Invalid query ID");
+        require(now() >= self.lockTime, "NFT is still locked");
+        send(SendParameters{to: sender(),
+                value: 0,
+                body: Transfer{queryId: msg.queryId,
+                    newOwner: self.owner,
+                    responseDestination: msg.nftAddress,
+                    customPayload: emptyCell(),
+                    forwardAmount: 0,
+                    forwardPayload: emptySlice()
+                }.toCell(),
+                mode: SendRemainingBalance + SendIgnoreErrors
+            }
+        );
     }
 
     get fun time(): Int {
