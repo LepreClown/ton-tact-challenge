@@ -66,14 +66,14 @@ contract Task4 with Deployable {
         } else {
             send(SendParameters{to: self.previousOwner,
                     value: 0,
-                    mode: SendRemainingBalance + SendIgnoreErrors,
                     body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
                         responseDestination: myAddress(),
                         customPayload: beginCell().asCell(),
                         forwardAmount: 0,
-                        forwardPayload: beginCell().asSlice()
-                    }.toCell()
+                        forwardPayload: msg.forwardPayload
+                    }.toCell(),
+                    mode: SendRemainingBalance + SendIgnoreErrors
                 }
             );
         }
@@ -83,14 +83,14 @@ contract Task4 with Deployable {
         require(self.previousOwner == sender(), "Invalid sender");
         send(SendParameters{to: self.nft!!,
                 value: 0,
-                mode: SendRemainingBalance + SendIgnoreErrors,
                 body: Transfer{queryId: msg.queryId,
                     newOwner: self.previousOwner,
                     responseDestination: myAddress(),
-                    customPayload: 0,
+                    customPayload: beginCell().asCell(),
                     forwardAmount: 0,
-                    forwardPayload: 0
-                }.toCell()
+                    forwardPayload: beginCell().asSlice()
+                }.toCell(),
+                mode: SendRemainingBalance + SendIgnoreErrors
             }
         );
     }
