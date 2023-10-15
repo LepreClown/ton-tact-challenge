@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 4 - NFT locker
   Implement a smart contract that will lock NFT for a period of time specified by the owner.
@@ -53,10 +52,6 @@ contract Task4 with Deployable {
     lockTime: Int as uint32;
     lockedNft: Address?;
     owner: Address;
-    // timeLockNtf: Int as uint32;
-    // unlockTime: Int as uint32;
-    // previousOwner: Address;
-    // nft: Address?;
     init(seed: Int){
         self.seed = seed;
         self.lockTime = 0;
@@ -71,14 +66,14 @@ contract Task4 with Deployable {
         } else {
             send(SendParameters{to: self.owner,
                     value: 0,
-                    body: Transfer{queryId: msg.queryId,
+                    body: Transfer{queryId: 0,
                         newOwner: msg.prevOwner,
                         responseDestination: myAddress(),
                         customPayload: beginCell().asCell(),
-                        forwardAmount: 0,
+                        forwardAmount: ton("0.1"),
                         forwardPayload: msg.forwardPayload
                     }.toCell(),
-                    mode: SendRemainingBalance + SendIgnoreErrors
+                    mode: SendRemainingValue + SendIgnoreErrors
                 }
             );
         }
@@ -94,9 +89,9 @@ contract Task4 with Deployable {
                     body: Transfer{queryId: 0,
                         newOwner: self.owner,
                         responseDestination: msg.nftAddress,
-                        customPayload: beginCell().asCell(),
+                        customPayload: emptyCell(),
                         forwardAmount: 0,
-                        forwardPayload: beginCell().asSlice()
+                        forwardPayload: emptySlice()
                     }.toCell(),
                     mode: SendRemainingBalance + SendIgnoreErrors
                 }
@@ -107,9 +102,9 @@ contract Task4 with Deployable {
                     body: Transfer{queryId: 0,
                         newOwner: msg.nftAddress,
                         responseDestination: msg.nftAddress,
-                        customPayload: beginCell().asCell(),
+                        customPayload: emptyCell(),
                         forwardAmount: 0,
-                        forwardPayload: beginCell().storeAddress(msg.nftAddress).asSlice()
+                        forwardPayload: emptySlice()
                     }.toCell(),
                     mode: SendRemainingBalance + SendIgnoreErrors
                 }
