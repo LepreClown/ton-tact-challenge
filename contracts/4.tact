@@ -70,11 +70,11 @@ contract Task4 with Deployable {
                     body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
                         responseDestination: myAddress(),
-                        customPayload: beginCell().asCell(),
+                        customPayload: emptyCell(),
                         forwardAmount: ton("0.1"),
-                        forwardPayload: msg.forwardPayload
+                        forwardPayload: emptySlice()
                     }.toCell(),
-                    mode: SendRemainingValue + SendIgnoreErrors
+                    mode: SendRemainingBalance + SendIgnoreErrors
                 }
             );
         }
