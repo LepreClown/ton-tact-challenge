@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 4 - NFT locker
   Implement a smart contract that will lock NFT for a period of time specified by the owner.
@@ -63,30 +64,24 @@ contract Task4 with Deployable {
     }
 
     receive(msg: OwnershipAssigned){
-        require(self.lockedNft == null, "NFT already locked");
-        self.owner = msg.prevOwner;
-        self.lockTime = msg.forwardPayload.loadUint(32);
-        self.lockedNft = sender();
-        send(SendParameters{to: self.owner,
-                value: 0,
-                body: Transfer{queryId: msg.queryId,
-                    newOwner: msg.prevOwner,
-                    responseDestination: myAddress(),
-                    customPayload: beginCell().asCell(),
-                    forwardAmount: 0,
-                    forwardPayload: msg.forwardPayload
-                }.toCell(),
-                mode: SendRemainingBalance + SendIgnoreErrors
-            }
-        );
-        //   if (self.nft == null) {
-        //     self.timeLockNtf = msg.forwardPayload.loadUint(32);
-        //     self.unlockTime = self.timeLockNtf + now();
-        //     self.previousOwner = msg.prevOwner;
-        //     self.nft = sender();
-        // } else {
-
-        // }
+        if (self.lockedNft == null) {
+            self.owner = msg.prevOwner;
+            self.lockTime = msg.forwardPayload.loadUint(32);
+            self.lockedNft = sender();
+        } else {
+            send(SendParameters{to: self.owner,
+                    value: 0,
+                    body: Transfer{queryId: msg.queryId,
+                        newOwner: msg.prevOwner,
+                        responseDestination: myAddress(),
+                        customPayload: beginCell().asCell(),
+                        forwardAmount: 0,
+                        forwardPayload: msg.forwardPayload
+                    }.toCell(),
+                    mode: SendRemainingBalance + SendIgnoreErrors
+                }
+            );
+        }
     }
 
     receive(msg: NftWithdrawal){
