@@ -1,7 +1,7 @@
 import "@stdlib/deploy";
 import "@stdlib/ownable";
 /*
- TASK 2 - Proxy
+ TASK 2 - Proxy 
   Create a contract that forwards all received TONs
   to the admin contract (whose address is set in init_store).
   Message from this proxy contract to the admin contract should contain:
@@ -31,16 +31,16 @@ contract Task2 with Deployable {
     receive(msg: Refund){
         require(self.admin == sender(), "Only admin can use this function");
         require(msg.queryId >= 0, "User not found");
-        send(SendParameters{to: msg.sender, value: ton("0.1"), mode: SendRemainingBalance + SendIgnoreErrors});
+        send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
     }
 
     receive(msg: Slice){
         let sender: Address = sender();
         let address: Address = self.admin;
         send(SendParameters{to: address,
-                value: ton("0.1"),
+                value: context().value,
                 body: BodyMessage{sender: sender(), ctx: msg}.toCell(),
-                mode: SendRemainingBalance + SendIgnoreErrors
+                mode: SendIgnoreErrors
             }
         );
     }
