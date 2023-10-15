@@ -1,6 +1,5 @@
 import "@stdlib/deploy";
 import "@stdlib/ownable";
-
 /*
  TASK 2 - Proxy 
   Create a contract that forwards all received TONs
@@ -29,7 +28,6 @@ contract Task2 with Deployable, Ownable {
 
     receive(msg: Refund){
         self.requireOwner();
-        require(msg.queryId >= 0, "User not found");
         send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
     }
 
