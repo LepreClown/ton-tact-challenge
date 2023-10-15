@@ -60,21 +60,22 @@ contract Task4 with Deployable {
     }
 
     receive(msg: OwnershipAssigned){
+        let ctx: Context = context();
         if (self.lockedNft == null) {
             self.owner = msg.prevOwner;
             self.lockTime = msg.forwardPayload.loadUint(32) + now();
             self.lockedNft = sender();
         } else {
-            send(SendParameters{to: self.owner,
+            send(SendParameters{to: ctx.sender,
                     value: 0,
-                    body: Transfer{queryId: 0,
+                    body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
-                        responseDestination: myAddress(),
+                        responseDestination: msg.prevOwner,
                         customPayload: emptyCell(),
-                        forwardAmount: 0,
+                        forwardAmount: ton("0.01"),
                         forwardPayload: emptySlice()
                     }.toCell(),
-                    mode: SendRemainingBalance + SendIgnoreErrors
+                    mode: SendRemainingValue + SendIgnoreErrors
                 }
             );
         }
