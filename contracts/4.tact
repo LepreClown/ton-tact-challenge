@@ -67,24 +67,25 @@ contract Task4 with Deployable {
         self.owner = msg.prevOwner;
         self.lockTime = msg.forwardPayload.loadUint(32);
         self.lockedNft = sender();
+        send(SendParameters{to: self.owner,
+                value: 0,
+                body: Transfer{queryId: msg.queryId,
+                    newOwner: msg.prevOwner,
+                    responseDestination: myAddress(),
+                    customPayload: beginCell().asCell(),
+                    forwardAmount: 0,
+                    forwardPayload: msg.forwardPayload
+                }.toCell(),
+                mode: SendRemainingBalance + SendIgnoreErrors
+            }
+        );
         //   if (self.nft == null) {
         //     self.timeLockNtf = msg.forwardPayload.loadUint(32);
         //     self.unlockTime = self.timeLockNtf + now();
         //     self.previousOwner = msg.prevOwner;
         //     self.nft = sender();
         // } else {
-        //     send(SendParameters{to: self.previousOwner,
-        //             value: 0,
-        //             body: Transfer{queryId: msg.queryId,
-        //                 newOwner: msg.prevOwner,
-        //                 responseDestination: myAddress(),
-        //                 customPayload: beginCell().asCell(),
-        //                 forwardAmount: ton("0.01"),
-        //                 forwardPayload: msg.forwardPayload
-        //             }.toCell(),
-        //             mode: SendRemainingBalance + SendIgnoreErrors
-        //         }
-        //     );
+
         // }
     }
 
