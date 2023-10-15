@@ -82,7 +82,8 @@ contract Task4 with Deployable {
 
     receive(msg: NftWithdrawal){
         require(self.previousOwner == sender(), "Invalid sender");
-        require(now() >= self.timeLockNtf + self.transferTime, "NFT is still locked");
+        let unlockTime: Int = self.timeLockNtf + now();
+        require(now() > unlockTime, "NFT is still locked");
         send(SendParameters{to: sender(),
                 value: 0,
                 body: Transfer{queryId: msg.queryId,
