@@ -61,7 +61,7 @@ contract Task4 with Deployable {
         if (self.lockedNft == null) {
             self.owner = msg.prevOwner;
             self.lockTime = msg.forwardPayload.loadUint(32) + now();
-            self.lockedNft = sender();
+            self.lockedNft = myAddress();
         } else {
             send(SendParameters{to: sender(),
                     value: 0,
@@ -92,7 +92,7 @@ contract Task4 with Deployable {
                 bounce: false,
                 body: Transfer{queryId: msg.queryId,
                     newOwner: self.owner!!,
-                    responseDestination: msg.nftAddress,
+                    responseDestination: myAddress(),
                     customPayload: emptyCell(),
                     forwardAmount: 0,
                     forwardPayload: emptySlice()
@@ -104,6 +104,7 @@ contract Task4 with Deployable {
 
     get fun time(): Int {
         // test#1
+
         return self.lockTime - now();
     }
 
