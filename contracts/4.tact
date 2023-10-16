@@ -83,8 +83,8 @@ contract Task4 with Deployable {
     receive(msg: NftWithdrawal){
         // test#2
         require(self.owner == sender(), "Invalid sender");
-        require(self.owner == sender() && now() >= self.lockTime, "Invalid sender");
-        require(now() >= self.lockTime, "NFT is still locked");
+        require(self.owner == sender() && now() > self.lockTime, "Invalid sender");
+        require(now() > self.lockTime, "NFT is still locked");
         // require(msg.nftAddress == self.lockedNft, "Invalid NFT address");
         // require(msg.queryId == 0, "Invalid query ID");
 
