@@ -51,11 +51,10 @@ contract Task4 with Deployable {
     seed: Int as uint128;
     lockTime: Int as uint32;
     lockedNft: Address?;
-    owner: Address;
+    owner: Address?;
     init(seed: Int){
         self.seed = seed;
         self.lockTime = 0;
-        self.owner = sender();
     }
 
     receive(msg: OwnershipAssigned){
@@ -89,11 +88,11 @@ contract Task4 with Deployable {
         // require(msg.nftAddress == self.lockedNft, "Invalid NFT address");
         // require(msg.queryId == 0, "Invalid query ID");
 
-        send(SendParameters{to: self.owner,
+        send(SendParameters{to: self.owner!!,
                 value: 0,
                 bounce: false,
                 body: Transfer{queryId: msg.queryId,
-                    newOwner: self.owner,
+                    newOwner: self.owner!!,
                     responseDestination: msg.nftAddress,
                     customPayload: emptyCell(),
                     forwardAmount: 0,
