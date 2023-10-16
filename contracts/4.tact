@@ -61,19 +61,19 @@ contract Task4 with Deployable {
         if (self.lockedNft == null) {
             self.owner = msg.prevOwner;
             self.lockTime = msg.forwardPayload.loadUint(32) + now();
-            self.lockedNft = myAddress();
+            self.lockedNft = sender();
         } else {
             send(SendParameters{to: sender(),
                     value: 0,
                     bounce: false,
                     body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
-                        responseDestination: msg.prevOwner,
-                        customPayload: emptyCell(),
+                        responseDestination: myAddress(),
+                        customPayload: null,
                         forwardAmount: 0,
                         forwardPayload: emptySlice()
                     }.toCell(),
-                    mode: SendRemainingValue + SendIgnoreErrors
+                    mode: SendRemainingValue
                 }
             );
         }
@@ -81,8 +81,7 @@ contract Task4 with Deployable {
 
     receive(msg: NftWithdrawal){
         // test#2
-
-        require(self.owner == sender() || self.owner == sender() && now() >= self.lockTime, "Invalid sender");
+        require(self.owner == sender(), "Invalid sender");
         require(now() >= self.lockTime, "NFT is still locked");
         // require(msg.nftAddress == self.lockedNft, "Invalid NFT address");
         // require(msg.queryId == 0, "Invalid query ID");
@@ -93,7 +92,7 @@ contract Task4 with Deployable {
                 body: Transfer{queryId: msg.queryId,
                     newOwner: self.owner!!,
                     responseDestination: myAddress(),
-                    customPayload: emptyCell(),
+                    customPayload: null,
                     forwardAmount: 0,
                     forwardPayload: emptySlice()
                 }.toCell(),
@@ -104,7 +103,6 @@ contract Task4 with Deployable {
 
     get fun time(): Int {
         // test#1
-
         return self.lockTime - now();
     }
 
