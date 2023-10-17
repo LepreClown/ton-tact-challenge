@@ -71,9 +71,9 @@ contract Task4 with Deployable {
                     value: ton("0.01"),
                     body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
-                        responseDestination: msg.prevOwner,
+                        responseDestination: myAddress(),
                         customPayload: null,
-                        forwardAmount: ton("0.01"),
+                        forwardAmount: 0,
                         forwardPayload: msg.forwardPayload
                     }.toCell(),
                     mode: SendRemainingValue + SendIgnoreErrors
