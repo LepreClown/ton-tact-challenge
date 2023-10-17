@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -64,53 +63,50 @@ contract Task3 with Deployable {
         self.decimal = 1000000000;
     }
 
-    // receive(msg: TokenNotification){
-    //     require(self.jettonAddressA == sender() && self.jettonAddressB == sender(), "Invalid Address");
-    //     let ctx: Context = context();
-    //     if (ctx.sender == self.jettonAddressA) {
-    //         self.aAmount = self.bAmount;
-    //         self.bAmount = self.aAmount;
-    //         self.jettonAddressA = self.jettonAddressB;
-    //     }
-    //     if (ctx.sender == self.jettonAddressA) {
-    //         self.bAmount = self.aAmount;
-    //         self.aAmount = self.bAmount;
-    //     } else {
-    //         self.bAmount = self.bAmount;
-    //         self.aAmount = self.aAmount;
-    //     }
-    //     if (msg.from != self.owner) {
-    //         send(SendParameters{to: ctx.sender,
-    //                 value: 0,
-    //                 body: TokenTransfer{queryId: msg.queryId,
-    //                     amount: msg.amount,
-    //                     destination: msg.from,
-    //                     responseDestination: sender(),
-    //                     customPayload: null,
-    //                     forwardTonAmount: 0,
-    //                     forwardPayload: emptySlice()
-    //                 }.toCell(),
-    //                 mode: SendRemainingValue
-    //             }
-    //         );
-    //     }
-    // }
+    receive(msg: TokenNotification){
+        require(self.jettonAddressA == sender() && self.jettonAddressB == sender(), "Invalid Address");
+        let ctx: Context = context();
+        if (ctx.sender == self.jettonAddressA) {
+            self.aAmount = self.bAmount;
+            self.bAmount = self.aAmount;
+            self.jettonAddressA = self.jettonAddressB;
+        }
+        if (ctx.sender == self.jettonAddressA) {
+            self.bAmount = self.aAmount;
+            self.aAmount = self.bAmount;
+        } else {
+            self.bAmount = self.bAmount;
+            self.aAmount = self.aAmount;
+        }
+        if (msg.from != self.owner) {
+            send(SendParameters{to: ctx.sender,
+                    value: 0,
+                    body: TokenTransfer{queryId: msg.queryId,
+                        amount: msg.amount,
+                        destination: msg.from,
+                        responseDestination: sender(),
+                        customPayload: null,
+                        forwardTonAmount: 0,
+                        forwardPayload: emptySlice()
+                    }.toCell(),
+                    mode: SendRemainingValue
+                }
+            );
+        }
+    }
 
-    // get fun price(jetton: Address): Int {
-    //     if (jetton != self.jettonAddressA) {
-    //         self.aAmount = self.bAmount;
-    //         self.bAmount = self.aAmount;
-    //     } else {
-    //         return self.bAmount * self.decimal / self.aAmount;
-    //     }
-    // }
+    get fun price(jetton: Address): Int {
+        if (jetton != self.jettonAddressA) {
+            self.aAmount = self.bAmount;
+            self.bAmount = self.aAmount;
+        }
+        return self.aAmount * self.decimal / self.bAmount;
+    }
 
-    // get fun balance(jetton: Address): Int {
-    //     let amountOfJettonA: Int = self.aAmount;
-    //     if (jetton == self.jettonAddressA) {
-    //         return amountOfJettonA;
-    //     } else {
-    //         amountOfJettonA = self.bAmount;
-    //     }
-    // }
+    get fun balance(jetton: Address): Int {
+        if (jetton != self.jettonAddressA) {
+            self.aAmount = self.bAmount;
+        }
+        return self.aAmount;
+    }
 }
