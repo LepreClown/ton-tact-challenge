@@ -35,7 +35,7 @@ describe('Task4', () => {
             $$type: 'OwnershipAssigned',
             queryId: 1n,
             prevOwner: deployer.address,
-            forwardPayload: beginCell().storeBit(32).asCell(),
+            forwardPayload: beginCell().storeUint(20,32).asCell(),
         };
 
         await task4.send(
