@@ -82,7 +82,7 @@ contract Task3 with Deployable {
             if (self.aAmount == 0 && self.bAmount == 0) {
                 send(SendParameters{to: ctx.sender,
                         value: 0,
-                        body: TokenTransfer{queryId: msg.queryId,
+                        body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
                             destination: msg.from,
                             responseDestination: myAddress(),
@@ -97,7 +97,7 @@ contract Task3 with Deployable {
             if (self.aAmount < amountOfAJettonToSend) {
                 send(SendParameters{to: ctx.sender,
                         value: 0,
-                        body: TokenTransfer{queryId: msg.queryId,
+                        body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
                             destination: msg.from,
                             responseDestination: myAddress(),
@@ -111,7 +111,7 @@ contract Task3 with Deployable {
             } else {
                 send(SendParameters{to: self.jettonAddressA,
                         value: 0,
-                        body: TokenTransfer{queryId: msg.queryId,
+                        body: TokenTransfer{queryId: 0,
                             amount: amountOfAJettonToSend,
                             destination: msg.from,
                             responseDestination: myAddress(),
