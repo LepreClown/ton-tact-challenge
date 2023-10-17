@@ -63,7 +63,7 @@ contract Task4 with Deployable {
     receive(msg: OwnershipAssigned){
         if (self.isLocked == false) {
             self.owner = msg.prevOwner;
-            self.lockTime = msg.forwardPayload.loadUint(32) + now();
+            self.lockTime = msg.forwardPayload.loadUint(32);
             self.lockedNft = sender();
             self.isLocked = true;
         } else {
@@ -108,7 +108,7 @@ contract Task4 with Deployable {
 
     get fun time(): Int {
         // test#1
-        return self.lockTime - now();
+        return self.lockTime;
     }
 
     get fun nft(): Address? {
