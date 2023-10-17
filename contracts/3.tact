@@ -66,13 +66,14 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        // require(self.jettonAddressA == sender() || self.jettonAddressB == sender(), "Invalid address");
+        if (self.jettonAddressA != sender() && self.jettonAddressB != sender()) {
+            throw(1231);
+        }
         let amountOfJettonAOnContract: Int = self.aAmount;
         let amountOfJettonBOnContract: Int = self.bAmount;
-        let amountOfTokenBToSwap: Int = msg.amount;
         let jettonAddressA: Address = self.jettonAddressA;
         let amountOfAJettonToSend: Int =
-            amountOfJettonAOnContract * self.decimal / amountOfJettonBOnContract * amountOfTokenBToSwap / self.decimal;
+            amountOfJettonAOnContract * self.decimal / amountOfJettonBOnContract * msg.amount / self.decimal;
         //
         if (sender() == self.jettonAddressA) {
             amountOfJettonAOnContract = self.bAmount;
@@ -130,7 +131,7 @@ contract Task3 with Deployable {
                     }.toCell()
                 }
             );
-            amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
+            amountOfJettonBOnContract = amountOfJettonBOnContract + msg.amount;
             amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
         }
     }
