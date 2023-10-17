@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -37,15 +38,14 @@ message(0x7362d09c) TokenNotification {
     from: Address;
     forwardPayload: Slice as remaining;
 }
-// To simplify the testing process and the specificity of the messages being sent, we decided to add clear default values in this transaction
 message(0xf8a7ea5) TokenTransfer {
-    queryId: Int as uint64; // should be 0
-    amount: Int as coins; // should be amount of jettons to send
-    destination: Address; // should be user address / TokenNotification.from
-    responseDestination: Address?; // should be myAddress()
-    customPayload: Cell?; // should be null
-    forwardTonAmount: Int as coins; // should be ton("0.01")
-    forwardPayload: Slice as remaining; // should be emptySlice()
+    queryId: Int as uint64;
+    amount: Int as coins;
+    destination: Address;
+    responseDestination: Address?;
+    customPayload: Cell?;
+    forwardTonAmount: Int as coins;
+    forwardPayload: Slice as remaining;
 }
 
 contract Task3 with Deployable {
@@ -64,53 +64,53 @@ contract Task3 with Deployable {
         self.decimal = 1000000000;
     }
 
-    receive(msg: TokenNotification){
-        require(self.jettonAddressA == sender() && self.jettonAddressB == sender(), "Invalid Address");
-        let ctx: Context = context();
-        if (ctx.sender == self.jettonAddressA) {
-            self.aAmount = self.bAmount;
-            self.bAmount = self.aAmount;
-            self.jettonAddressA = self.jettonAddressB;
-        }
-        if (ctx.sender == self.jettonAddressA) {
-            self.bAmount = self.aAmount;
-            self.aAmount = self.bAmount;
-        } else {
-            self.bAmount = self.bAmount;
-            self.aAmount = self.aAmount;
-        }
-        if (msg.from != self.owner) {
-            send(SendParameters{to: ctx.sender,
-                    value: 0,
-                    body: TokenTransfer{queryId: msg.queryId,
-                        amount: msg.amount,
-                        destination: msg.from,
-                        responseDestination: sender(),
-                        customPayload: null,
-                        forwardTonAmount: 0,
-                        forwardPayload: emptySlice()
-                    }.toCell(),
-                    mode: SendRemainingValue
-                }
-            );
-        }
-    }
+    // receive(msg: TokenNotification){
+    //     require(self.jettonAddressA == sender() && self.jettonAddressB == sender(), "Invalid Address");
+    //     let ctx: Context = context();
+    //     if (ctx.sender == self.jettonAddressA) {
+    //         self.aAmount = self.bAmount;
+    //         self.bAmount = self.aAmount;
+    //         self.jettonAddressA = self.jettonAddressB;
+    //     }
+    //     if (ctx.sender == self.jettonAddressA) {
+    //         self.bAmount = self.aAmount;
+    //         self.aAmount = self.bAmount;
+    //     } else {
+    //         self.bAmount = self.bAmount;
+    //         self.aAmount = self.aAmount;
+    //     }
+    //     if (msg.from != self.owner) {
+    //         send(SendParameters{to: ctx.sender,
+    //                 value: 0,
+    //                 body: TokenTransfer{queryId: msg.queryId,
+    //                     amount: msg.amount,
+    //                     destination: msg.from,
+    //                     responseDestination: sender(),
+    //                     customPayload: null,
+    //                     forwardTonAmount: 0,
+    //                     forwardPayload: emptySlice()
+    //                 }.toCell(),
+    //                 mode: SendRemainingValue
+    //             }
+    //         );
+    //     }
+    // }
 
-    get fun price(jetton: Address): Int {
-        if (jetton != self.jettonAddressA) {
-            self.aAmount = self.bAmount;
-            self.bAmount = self.aAmount;
-        } else {
-            return self.bAmount * self.decimal / self.aAmount;
-        }
-    }
+    // get fun price(jetton: Address): Int {
+    //     if (jetton != self.jettonAddressA) {
+    //         self.aAmount = self.bAmount;
+    //         self.bAmount = self.aAmount;
+    //     } else {
+    //         return self.bAmount * self.decimal / self.aAmount;
+    //     }
+    // }
 
-    get fun balance(jetton: Address): Int {
-        let amountOfJettonA: Int = self.aAmount;
-        if (jetton == self.jettonAddressA) {
-            return amountOfJettonA;
-        } else {
-            amountOfJettonA = self.bAmount;
-        }
-    }
+    // get fun balance(jetton: Address): Int {
+    //     let amountOfJettonA: Int = self.aAmount;
+    //     if (jetton == self.jettonAddressA) {
+    //         return amountOfJettonA;
+    //     } else {
+    //         amountOfJettonA = self.bAmount;
+    //     }
+    // }
 }
