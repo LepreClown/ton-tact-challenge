@@ -67,25 +67,61 @@ contract Task3 with Deployable {
     receive(msg: TokenNotification){
         require(self.jettonAddressA == sender() && self.jettonAddressB == sender(), "Invalid Address");
         let ctx: Context = context();
+        let amountOfAJettonToSend: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
         if (ctx.sender == self.jettonAddressA) {
             self.aAmount = self.bAmount;
             self.bAmount = self.aAmount;
             self.jettonAddressA = self.jettonAddressB;
         }
         if (msg.from != self.owner) {
-            send(SendParameters{to: ctx.sender,
-                    value: 0,
-                    body: TokenTransfer{queryId: msg.queryId,
-                        amount: msg.amount,
-                        destination: msg.from,
-                        responseDestination: sender(),
-                        customPayload: null,
-                        forwardTonAmount: 0,
-                        forwardPayload: emptySlice()
-                    }.toCell(),
-                    mode: SendRemainingValue
-                }
-            );
+            if (self.aAmount == 0 && self.bAmount == 0) {
+                send(SendParameters{to: ctx.sender,
+                        value: 0,
+                        body: TokenTransfer{queryId: msg.queryId,
+                            amount: msg.amount,
+                            destination: msg.from,
+                            responseDestination: sender(),
+                            customPayload: null,
+                            forwardTonAmount: 0,
+                            forwardPayload: emptySlice()
+                        }.toCell(),
+                        mode: SendRemainingValue
+                    }
+                );
+            }
+            if (self.aAmount < amountOfAJettonToSend) {
+                send(SendParameters{to: ctx.sender,
+                        value: 0,
+                        body: TokenTransfer{queryId: msg.queryId,
+                            amount: msg.amount,
+                            destination: msg.from,
+                            responseDestination: sender(),
+                            customPayload: null,
+                            forwardTonAmount: 0,
+                            forwardPayload: emptySlice()
+                        }.toCell(),
+                        mode: SendRemainingValue
+                    }
+                );
+            } else {
+                send(SendParameters{to: self.jettonAddressA,
+                        value: 0,
+                        body: TokenTransfer{queryId: msg.queryId,
+                            amount: amountOfAJettonToSend,
+                            destination: msg.from,
+                            responseDestination: sender(),
+                            customPayload: null,
+                            forwardTonAmount: 0,
+                            forwardPayload: emptySlice()
+                        }.toCell(),
+                        mode: 0
+                    }
+                );
+            }
+            self.bAmount = self.bAmount + msg.amount;
+            self.aAmount = self.bAmount - amountOfAJettonToSend;
+        } else {
+            self.bAmount = self.bAmount + msg.amount;
         }
     }
 
