@@ -123,10 +123,10 @@ contract Task3 with Deployable {
                     }
                 );
             }
-            self.bAmount = self.bAmount + msg.amount;
-            self.aAmount = self.bAmount - amountOfAJettonToSend;
+            amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
+            amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
         } else {
-            self.bAmount = self.bAmount + msg.amount;
+            amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
         }
     }
 
