@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -112,7 +111,7 @@ contract Task3 with Deployable {
                 );
             }
             send(SendParameters{to: jettonAddressA,
-                    value: 0,
+                    value: ton("0.1"),
                     body: TokenTransfer{queryId: 0,
                         amount: amountOfAJettonToSend,
                         destination: msg.from,
