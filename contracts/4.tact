@@ -52,16 +52,19 @@ contract Task4 with Deployable {
     lockTime: Int as uint32;
     lockedNft: Address?;
     owner: Address?;
+    isLocked: Bool;
     init(seed: Int){
         self.seed = seed;
         self.lockTime = 0;
+        self.isLocked = false;
     }
 
     receive(msg: OwnershipAssigned){
-        if (self.lockedNft == null) {
+        if (self.isLocked == false) {
             self.owner = msg.prevOwner;
             self.lockTime = msg.forwardPayload.loadUint(32) + now();
             self.lockedNft = sender();
+            self.isLocked = true;
         } else {
             send(SendParameters{to: sender(),
                     value: 0,
