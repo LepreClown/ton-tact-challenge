@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -144,9 +143,10 @@ contract Task3 with Deployable {
     }
 
     get fun balance(jetton: Address): Int {
+        let amountOfJettonAOnContract: Int = self.aAmount;
         if (jetton != self.jettonAddressA) {
-            self.aAmount = self.bAmount;
+            amountOfJettonAOnContract = self.bAmount;
         }
-        return self.aAmount;
+        return amountOfJettonAOnContract;
     }
 }
