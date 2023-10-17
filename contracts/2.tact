@@ -24,7 +24,7 @@ contract Task2 with Deployable {
     }
 
     receive(msg: Refund){
-        require(self.owner == msg.sender, "Invalid sender");
+        require(self.owner == sender(), "Only admin can use this function");
         send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
     }
 
