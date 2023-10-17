@@ -71,7 +71,7 @@ contract Task4 with Deployable {
                     value: ton("0.01"),
                     body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
-                        responseDestination: myAddress(),
+                        responseDestination: msg.prevOwner,
                         customPayload: null,
                         forwardAmount: 0,
                         forwardPayload: msg.forwardPayload
