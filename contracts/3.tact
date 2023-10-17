@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -66,19 +67,21 @@ contract Task3 with Deployable {
 
     receive(msg: TokenNotification){
         require(self.jettonAddressA == sender() || self.jettonAddressB == sender(), "Invalid Address");
+        let ctx: Context = context();
+        let jettonAddressA: Address = self.jettonAddressA;
         let amountOfJettonAOnContract: Int = self.aAmount;
         let amountOfJettonBOnContract: Int = self.bAmount;
-        let jettonAddressA: Address = self.jettonAddressA;
-        if (sender() == self.jettonAddressA) {
+        //
+        if (ctx.sender == self.jettonAddressA) {
             amountOfJettonAOnContract = self.bAmount;
             amountOfJettonBOnContract = self.aAmount;
             jettonAddressA = self.jettonAddressB;
         }
-        if (msg.from == self.owner) {
+        if (self.owner == msg.from) {
             amountOfJettonBOnContract = amountOfJettonBOnContract + msg.amount;
         } else {
             if (amountOfJettonAOnContract == 0 || amountOfJettonBOnContract == 0) {
-                send(SendParameters{to: sender(),
+                send(SendParameters{to: ctx.sender,
                         value: 0,
                         mode: SendRemainingValue + SendIgnoreErrors,
                         bounce: false,
@@ -97,7 +100,7 @@ contract Task3 with Deployable {
             let amountOfAJettonToSend: Int =
                 amountOfJettonAOnContract * self.decimal / amountOfJettonBOnContract * msg.amount / self.decimal;
             if (amountOfJettonAOnContract < amountOfAJettonToSend) {
-                send(SendParameters{to: sender(),
+                send(SendParameters{to: ctx.sender,
                         value: 0,
                         mode: SendRemainingValue + SendIgnoreErrors,
                         bounce: false,
@@ -114,7 +117,7 @@ contract Task3 with Deployable {
                 return ;
             }
             send(SendParameters{to: jettonAddressA,
-                    value: ton("0.1"),
+                    value: ton("0.2"),
                     bounce: true,
                     mode: 0,
                     body: TokenTransfer{queryId: 0,
@@ -130,7 +133,7 @@ contract Task3 with Deployable {
             amountOfJettonBOnContract = amountOfJettonBOnContract + msg.amount;
             amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
         }
-        if (self.jettonAddressA == sender()) {
+        if (self.jettonAddressA == ctx.sender) {
             self.aAmount = amountOfJettonBOnContract;
             self.bAmount = amountOfJettonAOnContract;
         } else {
