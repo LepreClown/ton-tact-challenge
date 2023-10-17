@@ -66,7 +66,7 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        require(self.jettonAddressA == sender() || self.jettonAddressB == sender(), "Invalid address");
+        // require(self.jettonAddressA == sender() || self.jettonAddressB == sender(), "Invalid address");
         let amountOfJettonAOnContract: Int = self.aAmount;
         let amountOfJettonBOnContract: Int = self.bAmount;
         let amountOfTokenBToSwap: Int = msg.amount;
