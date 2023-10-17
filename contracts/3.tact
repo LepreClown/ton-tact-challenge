@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -79,7 +78,9 @@ contract Task3 with Deployable {
             amountOfJettonBOnContract = self.aAmount;
             jettonAddressA = self.jettonAddressB;
         }
-        if (msg.from != self.owner) {
+        if (msg.from == self.owner) {
+            amountOfJettonBOnContract = amountOfJettonBOnContract + msg.amount;
+        } else {
             if (amountOfJettonAOnContract == 0 || amountOfJettonBOnContract == 0) {
                 send(SendParameters{to: sender(),
                         value: 0,
@@ -128,8 +129,6 @@ contract Task3 with Deployable {
             );
             amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
             amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
-        } else {
-            amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
         }
     }
 
