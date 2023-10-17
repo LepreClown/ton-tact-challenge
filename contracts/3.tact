@@ -130,6 +130,13 @@ contract Task3 with Deployable {
         } else {
             amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
         }
+        if (sender() == self.jettonAddressA) {
+            self.bAmount = amountOfJettonAOnContract;
+            self.aAmount = amountOfJettonBOnContract;
+        } else {
+            self.bAmount = amountOfJettonBOnContract;
+            self.aAmount = amountOfJettonAOnContract;
+        }
     }
 
     get fun price(jetton: Address): Int {
