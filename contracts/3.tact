@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -93,6 +94,7 @@ contract Task3 with Deployable {
                         mode: SendRemainingValue
                     }
                 );
+                return ;
             }
             if (self.aAmount < amountOfAJettonToSend) {
                 send(SendParameters{to: ctx.sender,
@@ -108,21 +110,21 @@ contract Task3 with Deployable {
                         mode: SendRemainingValue
                     }
                 );
-            } else {
-                send(SendParameters{to: self.jettonAddressA,
-                        value: 0,
-                        body: TokenTransfer{queryId: 0,
-                            amount: amountOfAJettonToSend,
-                            destination: msg.from,
-                            responseDestination: myAddress(),
-                            customPayload: null,
-                            forwardTonAmount: ton("0.01"),
-                            forwardPayload: emptySlice()
-                        }.toCell(),
-                        mode: 0
-                    }
-                );
+                return ;
             }
+            send(SendParameters{to: self.jettonAddressA,
+                    value: 0,
+                    body: TokenTransfer{queryId: 0,
+                        amount: amountOfAJettonToSend,
+                        destination: msg.from,
+                        responseDestination: myAddress(),
+                        customPayload: null,
+                        forwardTonAmount: ton("0.01"),
+                        forwardPayload: emptySlice()
+                    }.toCell(),
+                    mode: 0
+                }
+            );
             amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
             amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
         } else {
