@@ -64,7 +64,7 @@ contract Task4 with Deployable {
                     body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
                         responseDestination: msg.prevOwner,
-                        customPayload: emptyCell(),
+                        customPayload: null,
                         forwardAmount: 0,
                         forwardPayload: emptySlice()
                     }.toCell(),
@@ -88,12 +88,13 @@ contract Task4 with Deployable {
             self.owner = null;
             self.lockedNft = null;
             self.lockTime = 0;
+            let sender: Address = sender();
             send(SendParameters{to: msg.nftAddress,
                     value: 0,
                     body: Transfer{queryId: msg.queryId,
-                        newOwner: sender(),
-                        responseDestination: sender(),
-                        customPayload: emptyCell(),
+                        newOwner: sender,
+                        responseDestination: sender,
+                        customPayload: null,
                         forwardAmount: 0,
                         forwardPayload: emptySlice()
                     }.toCell(),
