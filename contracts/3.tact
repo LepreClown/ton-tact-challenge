@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -39,13 +38,13 @@ message(0x7362d09c) TokenNotification {
     forwardPayload: Slice as remaining;
 }
 message(0xf8a7ea5) TokenTransfer {
-    queryId: Int as uint64;
-    amount: Int as coins;
-    destination: Address;
-    responseDestination: Address?;
-    customPayload: Cell?;
-    forwardTonAmount: Int as coins;
-    forwardPayload: Slice as remaining;
+    queryId: Int as uint64; // should be 0
+    amount: Int as coins; // should be amount of jettons to send
+    destination: Address; // should be user address / TokenNotification.from
+    responseDestination: Address?; // should be myAddress()
+    customPayload: Cell?; // should be null
+    forwardTonAmount: Int as coins; // should be ton("0.01")
+    forwardPayload: Slice as remaining; // should be emptySlice()
 }
 
 contract Task3 with Deployable {
@@ -66,11 +65,17 @@ contract Task3 with Deployable {
 
     receive(msg: TokenNotification){
         require(self.jettonAddressA == sender() && self.jettonAddressB == sender(), "Invalid Address");
+        //
         let ctx: Context = context();
-        let amountOfAJettonToSend: Int = self.aAmount * self.decimal / self.bAmount * msg.amount / self.decimal;
+        let amountOfJettonAOnContract: Int = self.aAmount;
+        let amountOfJettonBOnContract: Int = self.bAmount;
+        let amountOfTokenBToSwap: Int = msg.amount;
+        let amountOfAJettonToSend: Int =
+            amountOfJettonAOnContract * self.decimal / amountOfJettonBOnContract * amountOfTokenBToSwap / self.decimal;
+        //
         if (ctx.sender == self.jettonAddressA) {
-            self.aAmount = self.bAmount;
-            self.bAmount = self.aAmount;
+            amountOfJettonAOnContract = self.bAmount;
+            amountOfJettonBOnContract = self.aAmount;
             self.jettonAddressA = self.jettonAddressB;
         }
         if (msg.from != self.owner) {
@@ -80,9 +85,9 @@ contract Task3 with Deployable {
                         body: TokenTransfer{queryId: msg.queryId,
                             amount: msg.amount,
                             destination: msg.from,
-                            responseDestination: sender(),
+                            responseDestination: myAddress(),
                             customPayload: null,
-                            forwardTonAmount: 0,
+                            forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
                         mode: SendRemainingValue
@@ -95,9 +100,9 @@ contract Task3 with Deployable {
                         body: TokenTransfer{queryId: msg.queryId,
                             amount: msg.amount,
                             destination: msg.from,
-                            responseDestination: sender(),
+                            responseDestination: myAddress(),
                             customPayload: null,
-                            forwardTonAmount: 0,
+                            forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
                         mode: SendRemainingValue
@@ -109,9 +114,9 @@ contract Task3 with Deployable {
                         body: TokenTransfer{queryId: msg.queryId,
                             amount: amountOfAJettonToSend,
                             destination: msg.from,
-                            responseDestination: sender(),
+                            responseDestination: myAddress(),
                             customPayload: null,
-                            forwardTonAmount: 0,
+                            forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
                         mode: 0
