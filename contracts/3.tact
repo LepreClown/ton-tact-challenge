@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -85,7 +84,6 @@ contract Task3 with Deployable {
             if (amountOfJettonAOnContract == 0 || amountOfJettonBOnContract == 0) {
                 send(SendParameters{to: sender(),
                         value: 0,
-                        mode: SendRemainingValue + SendIgnoreErrors,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
                             destination: msg.from,
@@ -93,7 +91,9 @@ contract Task3 with Deployable {
                             customPayload: null,
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
-                        }.toCell()
+                        }.toCell(),
+                        bounce: false,
+                        mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
                 return ;
@@ -101,7 +101,6 @@ contract Task3 with Deployable {
             if (amountOfJettonAOnContract < amountOfAJettonToSend) {
                 send(SendParameters{to: sender(),
                         value: 0,
-                        mode: SendRemainingValue + SendIgnoreErrors,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
                             destination: msg.from,
@@ -109,15 +108,15 @@ contract Task3 with Deployable {
                             customPayload: null,
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
-                        }.toCell()
+                        }.toCell(),
+                        bounce: false,
+                        mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
                 return ;
             }
             send(SendParameters{to: jettonAddressA,
-                    value: 0,
-                    bounce: true,
-                    mode: SendRemainingValue + SendIgnoreErrors,
+                    value: ton("0.2"),
                     body: TokenTransfer{queryId: 0,
                         amount: amountOfAJettonToSend,
                         destination: msg.from,
@@ -125,7 +124,9 @@ contract Task3 with Deployable {
                         customPayload: null,
                         forwardTonAmount: ton("0.01"),
                         forwardPayload: emptySlice()
-                    }.toCell()
+                    }.toCell(),
+                    bounce: true,
+                    mode: 0
                 }
             );
             amountOfJettonBOnContract = amountOfJettonBOnContract + msg.amount;
