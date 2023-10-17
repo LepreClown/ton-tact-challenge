@@ -71,16 +71,17 @@ contract Task3 with Deployable {
         let amountOfJettonAOnContract: Int = self.aAmount;
         let amountOfJettonBOnContract: Int = self.bAmount;
         let amountOfTokenBToSwap: Int = msg.amount;
+        let jettonAddressaA: Address = self.jettonAddressA;
         let amountOfAJettonToSend: Int =
             amountOfJettonAOnContract * self.decimal / amountOfJettonBOnContract * amountOfTokenBToSwap / self.decimal;
         //
         if (ctx.sender == self.jettonAddressA) {
             amountOfJettonAOnContract = self.bAmount;
             amountOfJettonBOnContract = self.aAmount;
-            self.jettonAddressA = self.jettonAddressB;
+            jettonAddressaA = self.jettonAddressB;
         }
         if (msg.from != self.owner) {
-            if (self.aAmount == 0 && self.bAmount == 0) {
+            if (amountOfJettonAOnContract == 0 && amountOfJettonBOnContract == 0) {
                 send(SendParameters{to: ctx.sender,
                         value: 0,
                         body: TokenTransfer{queryId: 0,
@@ -91,12 +92,12 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        mode: SendRemainingValue
+                        mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
                 return ;
             }
-            if (self.aAmount < amountOfAJettonToSend) {
+            if (amountOfJettonAOnContract < amountOfAJettonToSend) {
                 send(SendParameters{to: ctx.sender,
                         value: 0,
                         body: TokenTransfer{queryId: 0,
@@ -107,7 +108,7 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        mode: SendRemainingValue
+                        mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
                 return ;
