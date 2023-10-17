@@ -53,19 +53,19 @@ contract Task4 with Deployable {
     lockTime: Int as uint32;
     lockedNft: Address?;
     owner: Address?;
-    isLocked: Bool;
+    // isLocked: Bool;
     init(seed: Int){
         self.seed = seed;
         self.lockTime = 0;
-        self.isLocked = false;
+        // self.isLocked = false;
     }
 
     receive(msg: OwnershipAssigned){
-        if (self.isLocked == false) {
+        if (self.lockedNft == null) {
             self.owner = msg.prevOwner;
             self.lockTime = msg.forwardPayload.loadUint(32) + now();
             self.lockedNft = sender();
-            self.isLocked = true;
+            // self.isLocked = true;
         } else {
             send(SendParameters{to: sender(),
                     value: 0,
@@ -96,7 +96,6 @@ contract Task4 with Deployable {
             self.owner = null;
             self.lockedNft = null;
             self.lockTime = 0;
-            self.isLocked = false;
             send(SendParameters{to: msg.nftAddress,
                     value: 0,
                     body: Transfer{queryId: msg.queryId,
@@ -109,6 +108,7 @@ contract Task4 with Deployable {
                     mode: SendRemainingBalance + SendIgnoreErrors
                 }
             );
+            // self.isLocked = false;
         }
     }
 
