@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -66,16 +65,16 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        if (self.jettonAddressA != sender() && self.jettonAddressB != sender()) {
-            throw(1231);
-        }
+        require(self.jettonAddressA == sender() && self.jettonAddressB == sender(), "Invalid Address");
         let amountOfJettonAOnContract: Int = self.aAmount;
         let amountOfJettonBOnContract: Int = self.bAmount;
         let jettonAddressA: Address = self.jettonAddressA;
+        let amountOfAJettonToSend: Int =
+            amountOfJettonAOnContract * self.decimal / amountOfJettonBOnContract * msg.amount / self.decimal;
         if (sender() == self.jettonAddressA) {
+            jettonAddressA = self.jettonAddressB;
             amountOfJettonAOnContract = self.bAmount;
             amountOfJettonBOnContract = self.aAmount;
-            jettonAddressA = self.jettonAddressB;
         }
         if (msg.from == self.owner) {
             amountOfJettonBOnContract = amountOfJettonBOnContract + msg.amount;
@@ -84,7 +83,6 @@ contract Task3 with Deployable {
                 send(SendParameters{to: sender(),
                         value: 0,
                         mode: SendRemainingValue + SendIgnoreErrors,
-                        bounce: false,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
                             destination: msg.from,
@@ -97,13 +95,10 @@ contract Task3 with Deployable {
                 );
                 return ;
             }
-            let amountOfAJettonToSend: Int =
-                amountOfJettonAOnContract * self.decimal / amountOfJettonBOnContract * msg.amount / self.decimal;
             if (amountOfJettonAOnContract < amountOfAJettonToSend) {
                 send(SendParameters{to: sender(),
                         value: 0,
                         mode: SendRemainingValue + SendIgnoreErrors,
-                        bounce: false,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
                             destination: msg.from,
@@ -117,9 +112,8 @@ contract Task3 with Deployable {
                 return ;
             }
             send(SendParameters{to: jettonAddressA,
-                    value: ton("0.1"),
-                    bounce: true,
-                    mode: 0,
+                    value: 0,
+                    mode: SendRemainingValue + SendIgnoreErrors,
                     body: TokenTransfer{queryId: 0,
                         amount: amountOfAJettonToSend,
                         destination: msg.from,
@@ -132,6 +126,13 @@ contract Task3 with Deployable {
             );
             amountOfJettonBOnContract = amountOfJettonBOnContract + msg.amount;
             amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
+        }
+        if (sender() == self.jettonAddressA) {
+            self.bAmount = amountOfJettonAOnContract;
+            self.aAmount = amountOfJettonBOnContract;
+        } else {
+            self.bAmount = amountOfJettonBOnContract;
+            self.aAmount = amountOfJettonAOnContract;
         }
     }
 
