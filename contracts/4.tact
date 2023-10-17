@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 4 - NFT locker
   Implement a smart contract that will lock NFT for a period of time specified by the owner.
@@ -63,12 +62,12 @@ contract Task4 with Deployable {
     receive(msg: OwnershipAssigned){
         if (self.isLocked == false) {
             self.owner = msg.prevOwner;
-            self.lockTime = msg.forwardPayload.loadUint(32);
+            self.lockTime = msg.forwardPayload.loadUint(32) + now();
             self.lockedNft = sender();
             self.isLocked = true;
         } else {
             send(SendParameters{to: sender(),
-                    value: ton("0.01"),
+                    value: 0,
                     body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
                         responseDestination: msg.prevOwner,
@@ -83,32 +82,35 @@ contract Task4 with Deployable {
     }
 
     receive(msg: NftWithdrawal){
-        // test#2
         require(self.owner == sender(), "Invalid sender");
-        require(now() >= self.lockTime, "NFT is still locked");
-        self.owner = null;
-        self.lockedNft = null;
-        self.lockTime = 0;
-        // require(msg.nftAddress == self.lockedNft, "Invalid NFT address");
-        // require(msg.queryId == 0, "Invalid query ID");
-
-        send(SendParameters{to: msg.nftAddress,
-                value: 0,
-                body: Transfer{queryId: msg.queryId,
-                    newOwner: sender(),
-                    responseDestination: sender(),
-                    customPayload: null,
-                    forwardAmount: 0,
-                    forwardPayload: emptySlice()
-                }.toCell(),
-                mode: SendRemainingBalance + SendIgnoreErrors
-            }
-        );
+        if (now() < self.lockTime) {
+            send(SendParameters{to: sender(),
+                    value: 0,
+                    body: "NFT is still locked".asComment(),
+                    mode: SendRemainingValue + SendIgnoreErrors
+                }
+            );
+        } else {
+            self.owner = null;
+            self.lockedNft = null;
+            self.lockTime = 0;
+            send(SendParameters{to: msg.nftAddress,
+                    value: 0,
+                    body: Transfer{queryId: msg.queryId,
+                        newOwner: sender(),
+                        responseDestination: sender(),
+                        customPayload: null,
+                        forwardAmount: 0,
+                        forwardPayload: emptySlice()
+                    }.toCell(),
+                    mode: SendRemainingBalance + SendIgnoreErrors
+                }
+            );
+        }
     }
 
     get fun time(): Int {
-        // test#1
-        return self.lockTime;
+        return self.lockTime - now();
     }
 
     get fun nft(): Address? {
