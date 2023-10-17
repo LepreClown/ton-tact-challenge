@@ -88,12 +88,11 @@ contract Task4 with Deployable {
             self.owner = null;
             self.lockedNft = null;
             self.lockTime = 0;
-            let sender: Address = sender();
             send(SendParameters{to: msg.nftAddress,
                     value: 0,
                     body: Transfer{queryId: msg.queryId,
-                        newOwner: sender,
-                        responseDestination: sender,
+                        newOwner: sender(),
+                        responseDestination: sender(),
                         customPayload: null,
                         forwardAmount: 0,
                         forwardPayload: emptySlice()
