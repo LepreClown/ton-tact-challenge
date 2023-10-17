@@ -95,7 +95,6 @@ contract Task3 with Deployable {
                         mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
-                return ;
             }
             if (amountOfJettonAOnContract < amountOfAJettonToSend) {
                 send(SendParameters{to: sender(),
@@ -111,10 +110,9 @@ contract Task3 with Deployable {
                         mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
-                return ;
             }
             send(SendParameters{to: jettonAddressA,
-                    value: ton("0.1"),
+                    value: 0,
                     body: TokenTransfer{queryId: 0,
                         amount: amountOfAJettonToSend,
                         destination: msg.from,
@@ -130,13 +128,6 @@ contract Task3 with Deployable {
             amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
         } else {
             amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
-        }
-        if (sender() == self.jettonAddressA) {
-            self.bAmount = amountOfJettonAOnContract;
-            self.aAmount = amountOfJettonBOnContract;
-        } else {
-            self.bAmount = amountOfJettonBOnContract;
-            self.aAmount = amountOfJettonAOnContract;
         }
     }
 
