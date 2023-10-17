@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-import "@stdlib/ownable";
 /*
  TASK 2 - Proxy 
   Create a contract that forwards all received TONs
@@ -18,14 +17,14 @@ message(0x44) Refund {
     sender: Address;
 }
 
-contract Task2 with Deployable, Ownable {
+contract Task2 with Deployable {
     owner: Address;
     init(admin: Address){
         self.owner = admin;
     }
 
     receive(msg: Refund){
-        self.requireOwner();
+        require(self.owner == msg.sender, "Invalid sender");
         send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
     }
 
