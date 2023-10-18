@@ -54,32 +54,34 @@ contract Task4 with Deployable {
     }
 
     receive(msg: OwnershipAssigned){
-        let sender: Address = sender();
         if (self.lockedNft == null) {
             self.owner = msg.prevOwner;
             self.lockTime = msg.forwardPayload.loadUint(32) + now();
-            self.lockedNft = sender;
-        } else {
-            send(SendParameters{to: sender,
-                    value: 0,
-                    body: Transfer{queryId: msg.queryId,
-                        newOwner: msg.prevOwner,
-                        responseDestination: msg.prevOwner,
-                        customPayload: null,
-                        forwardAmount: 0,
-                        forwardPayload: emptySlice()
-                    }.toCell(),
-                    mode: SendRemainingValue
-                }
-            );
+            self.lockedNft = sender();
+            return ;
         }
+        send(SendParameters{to: sender(),
+                value: 0,
+                body: Transfer{queryId: msg.queryId,
+                    newOwner: msg.prevOwner,
+                    responseDestination: msg.prevOwner,
+                    customPayload: null,
+                    forwardAmount: 0,
+                    forwardPayload: emptySlice()
+                }.toCell(),
+                mode: SendRemainingValue
+            }
+        );
     }
 
     receive(msg: NftWithdrawal){
-        let sender: Address = sender();
-        require(self.owner == sender && self.owner != null, "Invalid sender");
+        require(self.owner == sender() && self.owner != null, "Invalid sender");
         if (now() < self.lockTime) {
-            send(SendParameters{to: sender, value: 0, body: "NFT is still locked".asComment(), mode: SendRemainingValue}
+            send(SendParameters{to: sender(),
+                    value: 0,
+                    body: "NFT is still locked".asComment(),
+                    mode: SendRemainingValue
+                }
             );
             return ;
         }
@@ -89,8 +91,8 @@ contract Task4 with Deployable {
         send(SendParameters{to: msg.nftAddress,
                 value: 0,
                 body: Transfer{queryId: msg.queryId,
-                    newOwner: sender,
-                    responseDestination: sender,
+                    newOwner: sender(),
+                    responseDestination: sender(),
                     customPayload: null,
                     forwardAmount: 0,
                     forwardPayload: emptySlice()
