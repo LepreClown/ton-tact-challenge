@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -99,7 +100,6 @@ contract Task3 with Deployable {
                         mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
-                return ;
             }
             if (amountOfJettonAOnContract < amountOfAJettonToSend) {
                 send(SendParameters{to: sender(),
@@ -115,7 +115,6 @@ contract Task3 with Deployable {
                         mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
-                return ;
             }
             send(SendParameters{to: jettonAddressA,
                     value: 0,
