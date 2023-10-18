@@ -25,11 +25,17 @@ contract Task2 with Deployable {
 
     receive(msg: Refund){
         require(self.owner == sender(), "Only admin can use this function");
-        send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
+        send(SendParameters{to: msg.sender, value: 0, bounce: true, mode: SendRemainingBalance + SendIgnoreErrors});
     }
 
     receive(msg: Slice){
         let msg_body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).asCell()).asCell();
-        send(SendParameters{to: self.owner, value: 0, body: msg_body, mode: SendRemainingBalance + SendIgnoreErrors});
+        send(SendParameters{to: self.owner,
+                value: 0,
+                body: msg_body,
+                bounce: true,
+                mode: SendRemainingBalance + SendIgnoreErrors
+            }
+        );
     }
 }

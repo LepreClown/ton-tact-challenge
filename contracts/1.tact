@@ -17,11 +17,8 @@ message Subtract {
 }
 
 contract Task1 with Deployable {
-    counter: Int as int32;
-
-    init(){
-        self.counter = 0;
-    }
+    counter: Int as int32 = 0;
+    init(){}
 
     receive(msg: Add){
         self.counter = self.counter + msg.number;
