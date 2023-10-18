@@ -80,6 +80,7 @@ contract Task3 with Deployable {
         if (self.owner == msg.from) {
             amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
         } else {
+            let sender: Address = sender();
             let amountOfAJettonToSend: Int =
                 amountOfJettonAOnContract *
                     self.decimal /
@@ -87,7 +88,7 @@ contract Task3 with Deployable {
                     amountOfTokenBToSwap /
                     self.decimal;
             if (amountOfJettonAOnContract < amountOfAJettonToSend) {
-                send(SendParameters{to: sender(),
+                send(SendParameters{to: sender,
                         value: 0,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
@@ -103,7 +104,7 @@ contract Task3 with Deployable {
                 return ;
             }
             if (amountOfJettonAOnContract * amountOfJettonBOnContract == 0) {
-                send(SendParameters{to: sender(),
+                send(SendParameters{to: sender,
                         value: 0,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
