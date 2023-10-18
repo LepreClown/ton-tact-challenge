@@ -68,9 +68,9 @@ contract Task3 with Deployable {
         let isSender: Bool = sender() == self.jettonAddressA;
         require(isSender || self.jettonAddressB == sender(), "Invalid Address");
         let jettonAddressA: Address = self.jettonAddressA;
-        let amountOfJettonAOnContract: Int = self.aAmount;
-        let amountOfJettonBOnContract: Int = self.bAmount;
-        let amountOfTokenBToSwap: Int = msg.amount;
+        let amountOfJettonAOnContract: Int = 0;
+        let amountOfJettonBOnContract: Int = 0;
+        let amountOfTokenBToSwap: Int = 0;
         //////////////////////////
         if (isSender) {
             amountOfJettonAOnContract = self.bAmount;
@@ -80,7 +80,6 @@ contract Task3 with Deployable {
         if (self.owner == msg.from) {
             amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
         } else {
-            let sender: Address = sender();
             let amountOfAJettonToSend: Int =
                 amountOfJettonAOnContract *
                     self.decimal /
@@ -88,7 +87,7 @@ contract Task3 with Deployable {
                     amountOfTokenBToSwap /
                     self.decimal;
             if (amountOfJettonAOnContract < amountOfAJettonToSend) {
-                send(SendParameters{to: sender,
+                send(SendParameters{to: sender(),
                         value: 0,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
@@ -104,7 +103,7 @@ contract Task3 with Deployable {
                 return ;
             }
             if (amountOfJettonAOnContract * amountOfJettonBOnContract == 0) {
-                send(SendParameters{to: sender,
+                send(SendParameters{to: sender(),
                         value: 0,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
