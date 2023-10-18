@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -85,23 +86,26 @@ contract Task3 with Deployable {
                     amountOfJettonBOnContract *
                     amountOfTokenBToSwap /
                     self.decimal;
-            if (amountOfJettonAOnContract < amountOfAJettonToSend) {
-                send(SendParameters{to: sender(),
-                        value: 0,
-                        body: TokenTransfer{queryId: 0,
-                            amount: msg.amount,
-                            destination: msg.from,
-                            responseDestination: myAddress(),
-                            customPayload: null,
-                            forwardTonAmount: ton("0.01"),
-                            forwardPayload: emptySlice()
-                        }.toCell(),
-                        mode: SendRemainingValue + SendIgnoreErrors
-                    }
-                );
-                return ;
-            }
-            if (amountOfJettonAOnContract * amountOfJettonBOnContract == 0) {
+            // if (amountOfJettonAOnContract < amountOfAJettonToSend) {
+            //     send(SendParameters{to: sender(),
+            //             value: 0,
+            //             body: TokenTransfer{queryId: 0,
+            //                 amount: msg.amount,
+            //                 destination: msg.from,
+            //                 responseDestination: myAddress(),
+            //                 customPayload: null,
+            //                 forwardTonAmount: ton("0.01"),
+            //                 forwardPayload: emptySlice()
+            //             }.toCell(),
+            //             mode: SendRemainingValue + SendIgnoreErrors
+            //         }
+            //     );
+            //     return ;
+            // }
+            if (
+                amountOfJettonAOnContract * amountOfJettonBOnContract == 0 ||
+                amountOfJettonAOnContract < amountOfAJettonToSend
+            ) {
                 send(SendParameters{to: sender(),
                         value: 0,
                         body: TokenTransfer{queryId: 0,
