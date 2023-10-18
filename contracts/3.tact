@@ -97,6 +97,7 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
+                        bounce: false,
                         mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
@@ -113,6 +114,7 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
+                        bounce: false,
                         mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
@@ -128,6 +130,7 @@ contract Task3 with Deployable {
                         forwardTonAmount: ton("0.01"),
                         forwardPayload: emptySlice()
                     }.toCell(),
+                    bounce: true,
                     mode: SendRemainingValue + SendIgnoreErrors
                 }
             );
