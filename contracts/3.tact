@@ -89,6 +89,7 @@ contract Task3 with Deployable {
             if (amountOfJettonAOnContract == 0 || amountOfJettonBOnContract == 0) {
                 send(SendParameters{to: sender(),
                         value: 0,
+                        bounce: false,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
                             destination: msg.from,
@@ -97,7 +98,6 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        bounce: false,
                         mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
@@ -106,6 +106,7 @@ contract Task3 with Deployable {
             if (amountOfJettonAOnContract < amountOfAJettonToSend) {
                 send(SendParameters{to: sender(),
                         value: 0,
+                        bounce: false,
                         body: TokenTransfer{queryId: 0,
                             amount: msg.amount,
                             destination: msg.from,
@@ -114,7 +115,6 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        bounce: false,
                         mode: SendRemainingValue + SendIgnoreErrors
                     }
                 );
@@ -122,6 +122,7 @@ contract Task3 with Deployable {
             }
             send(SendParameters{to: jettonAddressA,
                     value: 0,
+                    bounce: false,
                     body: TokenTransfer{queryId: 0,
                         amount: amountOfAJettonToSend,
                         destination: msg.from,
@@ -130,7 +131,6 @@ contract Task3 with Deployable {
                         forwardTonAmount: ton("0.01"),
                         forwardPayload: emptySlice()
                     }.toCell(),
-                    bounce: true,
                     mode: SendRemainingValue + SendIgnoreErrors
                 }
             );
