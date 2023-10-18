@@ -70,12 +70,13 @@ contract Task3 with Deployable {
         let amountOfJettonAOnContract: Int = self.aAmount;
         let amountOfJettonBOnContract: Int = self.bAmount;
         let amountOfTokenBToSwap: Int = msg.amount;
-        if (sender() == self.jettonAddressA) {
+        let isSender: Bool = sender() == self.jettonAddressA;
+        //////////////////////////
+        if (isSender) {
             amountOfJettonAOnContract = self.bAmount;
             amountOfJettonBOnContract = self.aAmount;
             jettonAddressA = self.jettonAddressB;
         }
-        //
         if (self.owner == msg.from) {
             amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
         } else {
@@ -133,7 +134,7 @@ contract Task3 with Deployable {
             amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
             amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
         }
-        if (self.jettonAddressA == sender()) {
+        if (isSender) {
             self.aAmount = amountOfJettonBOnContract;
             self.bAmount = amountOfJettonAOnContract;
         } else {
