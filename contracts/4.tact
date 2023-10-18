@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 4 - NFT locker
   Implement a smart contract that will lock NFT for a period of time specified by the owner.
@@ -46,7 +45,7 @@ message NftWithdrawal {
 
 contract Task4 with Deployable {
     seed: Int as uint128;
-    lockTime: Int as uint32 = 0;
+    lockTime: Int? as uint32;
     lockedNft: Address?;
     owner: Address?;
     init(seed: Int){
@@ -76,7 +75,7 @@ contract Task4 with Deployable {
 
     receive(msg: NftWithdrawal){
         require(self.owner == sender() && self.owner != null, "Invalid sender");
-        if (now() < self.lockTime) {
+        if (now() < self.lockTime!!) {
             send(SendParameters{to: sender(),
                     value: 0,
                     body: "NFT is still locked".asComment(),
@@ -103,11 +102,10 @@ contract Task4 with Deployable {
     }
 
     get fun time(): Int {
-        if (now() < self.lockTime) {
-            return self.lockTime - now();
-        } else {
-            return 0;
+        if (now() < self.lockTime!!) {
+            return self.lockTime!! - now();
         }
+        return 0;
     }
 
     get fun nft(): Address? {
