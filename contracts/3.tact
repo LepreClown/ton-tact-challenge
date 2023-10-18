@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -97,7 +98,7 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        mode: SendRemainingValue + SendIgnoreErrors
+                        mode: SendRemainingValue
                     }
                 );
                 return ;
@@ -113,7 +114,7 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        mode: SendRemainingValue + SendIgnoreErrors
+                        mode: SendRemainingValue
                     }
                 );
                 return ;
@@ -128,7 +129,7 @@ contract Task3 with Deployable {
                         forwardTonAmount: ton("0.01"),
                         forwardPayload: emptySlice()
                     }.toCell(),
-                    mode: SendRemainingValue + SendIgnoreErrors
+                    mode: SendRemainingValue
                 }
             );
             amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
@@ -144,17 +145,20 @@ contract Task3 with Deployable {
     }
 
     get fun price(jetton: Address): Int {
+        let amountOfJettonAOnContract: Int = self.aAmount;
+        let amountOfJettonBOnContract: Int = self.bAmount;
         if (jetton != self.jettonAddressA) {
-            self.aAmount = self.bAmount;
-            self.bAmount = self.aAmount;
+            amountOfJettonAOnContract = self.bAmount;
+            amountOfJettonBOnContract = self.aAmount;
         }
-        return self.bAmount * self.decimal / self.aAmount;
+        return amountOfJettonBOnContract * self.decimal / amountOfJettonAOnContract;
     }
 
     get fun balance(jetton: Address): Int {
+        let amountOfJettonAOnContract: Int = self.aAmount;
         if (jetton != self.jettonAddressA) {
-            self.aAmount = self.bAmount;
+            amountOfJettonAOnContract = self.bAmount;
         }
-        return self.aAmount;
+        return amountOfJettonAOnContract;
     }
 }
