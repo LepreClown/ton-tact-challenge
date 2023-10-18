@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 4 - NFT locker
   Implement a smart contract that will lock NFT for a period of time specified by the owner.
@@ -54,12 +53,13 @@ contract Task4 with Deployable {
     }
 
     receive(msg: OwnershipAssigned){
+        let ctx: Context = context();
         if (self.lockedNft == null) {
             self.owner = msg.prevOwner;
             self.lockTime = msg.forwardPayload.loadUint(32) + now();
-            self.lockedNft = sender();
+            self.lockedNft = ctx.sender;
         } else {
-            send(SendParameters{to: sender(),
+            send(SendParameters{to: ctx.sender,
                     value: 0,
                     body: Transfer{queryId: msg.queryId,
                         newOwner: msg.prevOwner,
@@ -75,9 +75,14 @@ contract Task4 with Deployable {
     }
 
     receive(msg: NftWithdrawal){
-        require(self.owner == sender() && self.owner != null, "Invalid sender");
+        let ctx: Context = context();
+        require(self.owner == ctx.sender && self.owner != null, "Invalid sender");
         if (now() < self.lockTime) {
-            send(SendParameters{to: sender(), value: 0, body: "NFT is still locked".asComment(), mode: SendIgnoreErrors}
+            send(SendParameters{to: ctx.sender,
+                    value: 0,
+                    body: "NFT is still locked".asComment(),
+                    mode: SendRemainingValue
+                }
             );
             return ;
         }
@@ -87,8 +92,8 @@ contract Task4 with Deployable {
         send(SendParameters{to: msg.nftAddress,
                 value: 0,
                 body: Transfer{queryId: msg.queryId,
-                    newOwner: sender(),
-                    responseDestination: sender(),
+                    newOwner: ctx.sender,
+                    responseDestination: ctx.sender,
                     customPayload: null,
                     forwardAmount: 0,
                     forwardPayload: emptySlice()
