@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -66,7 +65,8 @@ contract Task3 with Deployable {
     }
 
     receive(msg: TokenNotification){
-        require(self.jettonAddressA == sender() || self.jettonAddressB == sender(), "Invalid Address");
+        require(self.jettonAddressA == sender(), "Invalid Address");
+        require(self.jettonAddressB == sender(), "Invalid Address");
         let jettonAddressA: Address = self.jettonAddressA;
         let amountOfJettonAOnContract: Int = self.aAmount;
         let amountOfJettonBOnContract: Int = self.bAmount;
