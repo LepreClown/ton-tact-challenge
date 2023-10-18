@@ -137,9 +137,10 @@ contract Task3 with Deployable {
         if (isSender) {
             self.aAmount = amountOfJettonBOnContract;
             self.bAmount = amountOfJettonAOnContract;
+        } else {
+            self.aAmount = amountOfJettonAOnContract;
+            self.bAmount = amountOfJettonBOnContract;
         }
-        self.aAmount = amountOfJettonAOnContract;
-        self.bAmount = amountOfJettonBOnContract;
     }
 
     get fun price(jetton: Address): Int {
