@@ -50,18 +50,15 @@ message(0xf8a7ea5) TokenTransfer {
 
 contract Task3 with Deployable {
     owner: Address;
-    aAmount: Int;
-    bAmount: Int;
+    aAmount: Int = 0;
+    bAmount: Int = 0;
     jettonAddressA: Address;
     jettonAddressB: Address;
-    decimal: Int;
+    decimal: Int = 1000000000;
     init(admin: Address, newJettonAddressA: Address, newJettonAddressB: Address){
         self.owner = admin;
         self.jettonAddressA = newJettonAddressA;
         self.jettonAddressB = newJettonAddressB;
-        self.aAmount = 0;
-        self.bAmount = 0;
-        self.decimal = 1000000000;
     }
 
     receive(msg: TokenNotification){
@@ -118,6 +115,8 @@ contract Task3 with Deployable {
                 );
                 return ;
             }
+            amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
+            amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
             send(SendParameters{to: jettonAddressA,
                     value: 0,
                     body: TokenTransfer{queryId: 0,
@@ -131,8 +130,6 @@ contract Task3 with Deployable {
                     mode: SendRemainingValue
                 }
             );
-            amountOfJettonAOnContract = amountOfJettonAOnContract - amountOfAJettonToSend;
-            amountOfJettonBOnContract = amountOfJettonBOnContract + amountOfTokenBToSwap;
         }
         if (isSender) {
             self.aAmount = amountOfJettonBOnContract;
