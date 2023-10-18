@@ -86,11 +86,38 @@ contract Task3 with Deployable {
                     amountOfJettonBOnContract *
                     amountOfTokenBToSwap /
                     self.decimal;
-            if (
-                amountOfJettonAOnContract == 0 ||
-                amountOfJettonBOnContract == 0 ||
-                amountOfJettonAOnContract < amountOfAJettonToSend
-            ) {
+            if (amountOfJettonAOnContract < amountOfAJettonToSend) {
+                send(SendParameters{to: sender(),
+                        value: 0,
+                        body: TokenTransfer{queryId: 0,
+                            amount: msg.amount,
+                            destination: msg.from,
+                            responseDestination: myAddress(),
+                            customPayload: null,
+                            forwardTonAmount: ton("0.01"),
+                            forwardPayload: emptySlice()
+                        }.toCell(),
+                        mode: SendRemainingValue + SendIgnoreErrors
+                    }
+                );
+            }
+            if (amountOfJettonBOnContract == 0) {
+                send(SendParameters{to: sender(),
+                        value: 0,
+                        body: TokenTransfer{queryId: 0,
+                            amount: msg.amount,
+                            destination: msg.from,
+                            responseDestination: myAddress(),
+                            customPayload: null,
+                            forwardTonAmount: ton("0.01"),
+                            forwardPayload: emptySlice()
+                        }.toCell(),
+                        mode: SendRemainingValue + SendIgnoreErrors
+                    }
+                );
+                return ;
+            }
+            if (amountOfJettonAOnContract == 0) {
                 send(SendParameters{to: sender(),
                         value: 0,
                         body: TokenTransfer{queryId: 0,
