@@ -17,6 +17,10 @@ message(0x44) Refund {
     queryId: Int as uint64;
     sender: Address;
 }
+message Body {
+    arg1: Address;
+    arg2: Slice;
+}
 
 contract Task2 with Deployable {
     owner: Address;
@@ -26,11 +30,15 @@ contract Task2 with Deployable {
 
     receive(msg: Refund){
         require(self.owner == sender(), "Only admin can use this function");
-        send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance});
+        self.reply("".asComment());
     }
 
     receive(msg: Slice){
-        let msgBody: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).asCell()).asCell();
-        send(SendParameters{to: self.owner, value: 0, body: msgBody, mode: SendRemainingBalance});
+        send(SendParameters{to: self.owner,
+                value: 0,
+                body: Body{arg1: sender(), arg2: msg}.toCell(),
+                mode: SendRemainingBalance
+            }
+        );
     }
 }
