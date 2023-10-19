@@ -25,7 +25,7 @@ contract Task2 with Deployable {
     }
 
     receive(msg: Refund){
-        nativeThrowUnless(132, sender() != self.owner);
+        nativeThrowUnless(132, context().sender == self.owner);
         send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance});
     }
 
