@@ -20,6 +20,7 @@ import "@stdlib/deploy";
    - SC should check that incoming tx TON value is enough for NFT withdrawal. Specifically, at least: (1 + totalNftsHeld * 0.08) TONs. Otherwise throw "Insufficent funds"
    - SC should check that sender is the admin, throw "Invalid sender" otherwise
    - If all checks pass, SC should send NFTs one by one to the admin 
+   - SC should be able to withdraw all NFTs by a single message from admin
   * OwnershipAssigned 
    - if prevOwner is the owner's (admin) address, then add NFT to the collection
    - if value of TON attached is less then 2.1 TON then stop execution and return NFT back,
@@ -36,54 +37,101 @@ import "@stdlib/deploy";
      the order of NFTs in this dictionary doesn't matter
 */
 
-message AdminWithdrawalFees {
-  queryId: Int as uint64;
+message AdminWithdrawalProfit {
+    queryId: Int as uint64;
 }
-
 message AdminWithdrawalAllNFTs {
-  queryId: Int as uint64;
+    queryId: Int as uint64;
 }
-
-message AdminFetchFees {
-  queryId: Int as uint64;
+message AdminFetchProfit {
+    queryId: Int as uint64;
 }
-
 message(0x05138d91) OwnershipAssigned {
     queryId: Int as uint64;
     prevOwner: Address;
-    forwardPayload: Slice as remaining; 
+    forwardPayload: Slice as remaining;
 }
-
-message(0x5fcc3d14) Transfer { 
-    queryId: Int as uint64;            
-    newOwner: Address; 
-    responseDestination: Address; 
-    customPayload: Cell?; 
-    forwardAmount: Int as coins; 
-    forwardPayload: Slice as remaining; 
+message(0x5fcc3d14) Transfer {
+    queryId: Int as uint64;
+    newOwner: Address;
+    responseDestination: Address;
+    customPayload: Cell?;
+    forwardAmount: Int as coins;
+    forwardPayload: Slice as remaining;
 }
 
 contract Task5 with Deployable {
-  seed: Int as uint128;
-  owner: Address;
-  
-  init(seed: Int, owner: Address) {
-    self.owner = owner;
-    self.seed = seed; // needed to deploy multiple smart contracts copies from one admin address
-  }
+    seed: Int as uint128;
+    owner: Address;
+    recordNft: map<Address, Address>;
+    init(seed: Int, owner: Address){
+        self.owner = owner;
+        self.seed = seed;
+    }
 
-  receive(msg: OwnershipAssigned) {
-  }
+    receive(msg: OwnershipAssigned){
+        let ctx: Context = context();
+        if (msg.prevOwner == self.owner) {
+            if (self.recordNft.get(ctx.sender) == null) {
+                // TODO
+                // Do nothing
+            }
+            self.recordNft.set(ctx.sender, null);
+            send(SendParameters{to: ctx.sender,
+                    value: 0,
+                    bounce: false,
+                    mode: SendIgnoreErrors + SendRemainingValue,
+                    body: Transfer{queryId: 0,
+                        newOwner: self.recordNft.get(ctx.sender)!!,
+                        responseDestination: myAddress(),
+                        customPayload: emptyCell(),
+                        forwardAmount: ton("0.1"),
+                        forwardPayload: emptySlice()
+                    }.toCell()
+                }
+            );
+        } else {
+            self.recordNft.set(ctx.sender, msg.prevOwner); // [NFT Item Address] -> [Original Owner]
+            send(SendParameters{to: ctx.sender,
+                    value: 0,
+                    bounce: false,
+                    mode: SendIgnoreErrors + SendRemainingValue,
+                    body: Transfer{queryId: 0,
+                        newOwner: self.owner,
+                        responseDestination: myAddress(),
+                        customPayload: emptyCell(),
+                        forwardAmount: ton("0.03"),
+                        forwardPayload: emptySlice()
+                    }.toCell()
+                }
+            );
+        }
+        if (ctx.value < ton("2.1")) {
+            //  then stop execution and return NFT back,
+            // but only in case that TON attached is enough to process refund without losing TONs on the SC's balance
+        } else {
+            //randomly select NFT to send from all the NFTs that smart contract has
+            // send NFT 2, gas
+        }
+    }
 
-  receive(msg: AdminWithdrawalFees) {
-  }
+    receive(msg: AdminWithdrawalProfit){
+        require(sender() == self.owner, "Insufficient privelegies");
+        let ctx: Context = context();
+        send(SendParameters{to: sender(),
+                value: ctx.value - ton("0.1"),
+                body: AdminFetchProfit{queryId: msg.queryId}.toCell(),
+                mode: SendRemainingValue + SendIgnoreErrors
+            }
+        );
+    }
 
-  receive(msg: AdminWithdrawalAllNFTs) {
-  }
+    receive(msg: AdminWithdrawalAllNFTs){}
 
-  get fun profit(): Int { 
-  }
-  
-  get fun nfts(): map<Int as uint16, Address> { 
-  }
+    get fun profit(): Int {
+        return myBalance();
+    }
+
+    // get fun nfts(): map<Int as uint16, Address> {
+    // }
 }

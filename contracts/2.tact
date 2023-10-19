@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
  TASK 2 - Proxy 
   Create a contract that forwards all received TONs
@@ -24,8 +25,10 @@ contract Task2 with Deployable {
     }
 
     receive(msg: Refund){
-        require(self.owner == sender(), "Only admin can use this function");
-        send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
+        if (self.owner == sender()) {
+            send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance + SendIgnoreErrors});
+        }
+        return ;
     }
 
     receive(msg: Slice){
