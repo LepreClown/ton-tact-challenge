@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
  TASK 2 - Proxy 
   Create a contract that forwards all received TONs
@@ -24,7 +25,7 @@ contract Task2 with Deployable {
     }
 
     receive(msg: Refund){
-        nativeThrowUnless(132, sender() == self.owner);
+        nativeThrowUnless(132, sender() != self.owner);
         send(SendParameters{to: msg.sender, value: 0, mode: SendRemainingBalance});
     }
 
