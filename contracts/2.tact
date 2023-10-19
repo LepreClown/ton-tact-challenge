@@ -30,12 +30,7 @@ contract Task2 with Deployable {
     }
 
     receive(msg: Slice){
-        let b: Builder = beginCell();
-        send(SendParameters{to: self.owner,
-                value: 0,
-                body: b.storeAddress(sender()).storeRef(b.storeSlice(msg).endCell()).endCell(),
-                mode: SendRemainingBalance
-            }
-        );
+        let msgBody: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).asCell()).asCell();
+        send(SendParameters{to: self.owner, value: 0, body: msgBody, mode: SendRemainingBalance});
     }
 }
