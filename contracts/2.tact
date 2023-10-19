@@ -1,4 +1,5 @@
 import "@stdlib/deploy";
+
 /*
  TASK 2 - Proxy 
   Create a contract that forwards all received TONs
@@ -18,7 +19,7 @@ message(0x44) Refund {
 }
 
 contract Task2 with Deployable {
-    owner: Address?;
+    owner: Address;
     init(admin: Address){
         self.owner = admin;
     }
@@ -29,8 +30,11 @@ contract Task2 with Deployable {
     }
 
     receive(msg: Slice){
-        let msg_body: Cell = beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()
-        ).endCell();
-        send(SendParameters{to: self.owner!!, value: 0, body: msg_body, mode: SendRemainingBalance});
+        send(SendParameters{to: self.owner,
+                value: 0,
+                body: beginCell().storeAddress(sender()).storeRef(beginCell().storeSlice(msg).endCell()).endCell(),
+                mode: SendRemainingBalance
+            }
+        );
     }
 }
