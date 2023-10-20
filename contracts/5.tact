@@ -63,14 +63,14 @@ message(0x5fcc3d14) Transfer {
 contract Task5 with Deployable {
     seed: Int as uint128;
     owner: Address;
-    totalNfts: Int as uint16;
+
     nfts: map<Int as uint16, Address>;
     count: Int as uint16;
     init(seed: Int, owner: Address){
         self.owner = owner;
         self.seed = seed;
         self.count = 0;
-        self.totalNfts = 0;
+      
     }
 
     receive(msg: OwnershipAssigned){
@@ -98,7 +98,22 @@ contract Task5 with Deployable {
         } else {
             //randomly select NFT to send from all the NFTs that smart contract has
             // send NFT 2, gas
+            // let nft: Address = sender();
+            // let idx: Int = randomInt() % (self.count + 1);
+            // if(idx != self.count) {
+            // ......
+            // }
             // self.nfts.set(1, sender());
+
+            //nativeRandom()
+           
+            // You shouldn't use this function directly, use random and randomInt 
+            // functions instead. This function generates 256-bit 
+            // random number just like randomInt function, but random generator 
+            // is not initialized by nativePrepareRandom function.
+
+            //readForwardFee()
+            //Read and computes forward fee from Context and return it as Int value in nanoToncoins.
         }
     }
 
@@ -119,7 +134,7 @@ contract Task5 with Deployable {
 
     receive(msg: AdminWithdrawalAllNFTs){
         require(sender() == self.owner, "Insufficient privelegies");
-        let x: Int = self.totalNfts;
+        let x: Int = self.count;
        
         while (x > 0) {
             send(SendParameters{
@@ -138,7 +153,7 @@ contract Task5 with Deployable {
                 });
         }
         self.nfts = emptyMap();
-        self.totalNfts = 0;
+        self.count = 0;
     }
 
     get fun profit(): Int {
@@ -149,38 +164,3 @@ contract Task5 with Deployable {
         return self.nfts;
     }
 }
-// if (msg.prevOwner == self.owner) {
-//             if (self.init.get(ctx.sender) == null) {
-//                 // TODO
-//                 // Do nothing
-//             }
-//             self.init.set(ctx.sender, null);
-//             send(SendParameters{to: ctx.sender,
-//                     value: 0,
-//                     bounce: false,
-//                     mode: SendIgnoreErrors + SendRemainingValue,
-//                     body: Transfer{queryId: 0,
-//                         newOwner: self.recordNft.get(ctx.sender)!!,
-//                         responseDestination: myAddress(),
-//                         customPayload: emptyCell(),
-//                         forwardAmount: ton("0.1"),
-//                         forwardPayload: emptySlice()
-//                     }.toCell()
-//                 }
-//             );
-//         } else {
-//             self.recordNft.set(ctx.sender, msg.prevOwner); // [NFT Item Address] -> [Original Owner]
-//             send(SendParameters{to: ctx.sender,
-//                     value: 0,
-//                     bounce: false,
-//                     mode: SendIgnoreErrors + SendRemainingValue,
-//                     body: Transfer{queryId: 0,
-//                         newOwner: self.owner,
-//                         responseDestination: myAddress(),
-//                         customPayload: emptyCell(),
-//                         forwardAmount: ton("0.03"),
-//                         forwardPayload: emptySlice()
-//                     }.toCell()
-//                 }
-//             );
-//         }
