@@ -63,19 +63,17 @@ message(0x5fcc3d14) Transfer {
 contract Task5 with Deployable {
     seed: Int as uint128;
     owner: Address;
-
     nfts: map<Int as uint16, Address>;
     count: Int as uint16;
     init(seed: Int, owner: Address){
         self.owner = owner;
         self.seed = seed;
-        self.count = 0;
-      
+        self.count = 0;    
     }
 
     receive(msg: OwnershipAssigned){
         let ctx: Context = context();
-        require(msg.prevOwner == self.owner, "Invalid owner");
+        // require(msg.prevOwner == self.owner, "Invalid owner");
         if (ctx.value < ton("2.1")) {
             if(ctx.value > ton("0.08")){
                 send(SendParameters{
@@ -96,24 +94,18 @@ contract Task5 with Deployable {
             //  then stop execution and return NFT back,
             // but only in case that TON attached is enough to process refund without losing TONs on the SC's balance
         } else {
-            //randomly select NFT to send from all the NFTs that smart contract has
-            // send NFT 2, gas
-            // let nft: Address = sender();
-            // let idx: Int = randomInt() % (self.count + 1);
-            // if(idx != self.count) {
-            // ......
-            // }
-            // self.nfts.set(1, sender());
-
-            //nativeRandom()
-           
-            // You shouldn't use this function directly, use random and randomInt 
-            // functions instead. This function generates 256-bit 
-            // random number just like randomInt function, but random generator 
-            // is not initialized by nativePrepareRandom function.
-
-            //readForwardFee()
-            //Read and computes forward fee from Context and return it as Int value in nanoToncoins.
+            if(msg.prevOwner == self.owner) {
+                self.nfts.set(self.count, sender());
+                self.count = self.count +1;
+                return;
+            }
+            let nft: Address = sender();
+            let idx: Int = randomInt() % (self.count + 1);
+            
+            if(idx != self.count) {
+                         
+            }
+                      
         }
     }
 
@@ -138,8 +130,7 @@ contract Task5 with Deployable {
        
         while (x > 0) {
             send(SendParameters{
-                    // nft Address need I think
-                    to: sender(),
+                    to: self.nfts.get(x)!!,
                     value: ton("0.08"),
                     body: Transfer{
                     queryId: msg.queryId,
