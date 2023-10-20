@@ -73,7 +73,11 @@ contract Task5 with Deployable {
 
     receive(msg: OwnershipAssigned){
         let ctx: Context = context();
-        // require(msg.prevOwner == self.owner, "Invalid owner");
+        if(msg.prevOwner == self.owner) {
+                self.nfts.set(self.count, sender());
+                self.count = self.count +1;
+                return;
+        }  
         if (ctx.value < ton("2.1")) {
             if(ctx.value > ton("0.08")){
                 send(SendParameters{
@@ -81,8 +85,8 @@ contract Task5 with Deployable {
                     value: ctx.value,
                     body: Transfer{
                     queryId: msg.queryId,
-                    newOwner: sender(),
-                    responseDestination: sender(),
+                    newOwner: msg.prevOwner,
+                    responseDestination: msg.prevOwner,
                     customPayload: null,
                     forwardAmount: 0,
                     forwardPayload: emptySlice()
@@ -91,21 +95,23 @@ contract Task5 with Deployable {
                 });
                 return;
             }
-            //  then stop execution and return NFT back,
-            // but only in case that TON attached is enough to process refund without losing TONs on the SC's balance
         } else {
-            if(msg.prevOwner == self.owner) {
-                self.nfts.set(self.count, sender());
-                self.count = self.count +1;
-                return;
-            }
             let nft: Address = sender();
             let idx: Int = randomInt() % (self.count + 1);
-            
-            if(idx != self.count) {
-                         
-            }
-                      
+                   
+            send(SendParameters{
+                    to: self.nfts.get(idx)!!,
+                    value: ctx.value,
+                    body: Transfer{
+                    queryId: msg.queryId,
+                    newOwner: msg.prevOwner,
+                    responseDestination: msg.prevOwner,
+                    customPayload: null,
+                    forwardAmount: 0,
+                    forwardPayload: emptySlice()
+                    }.toCell(),
+                    mode: SendRemainingValue + SendIgnoreErrors
+            });        
         }
     }
 
@@ -142,6 +148,7 @@ contract Task5 with Deployable {
                     }.toCell(),
                     mode: SendRemainingValue + SendIgnoreErrors
                 });
+            x = x - 1;           
         }
         self.nfts = emptyMap();
         self.count = 0;
