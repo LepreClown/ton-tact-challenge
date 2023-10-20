@@ -94,7 +94,7 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        mode: 64
+                        mode: SendRemainingValue
                     }
                 );
                 return ;
@@ -110,7 +110,7 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        mode: 64
+                        mode: SendRemainingValue
                     }
                 );
                 return ;
@@ -127,7 +127,7 @@ contract Task3 with Deployable {
                         forwardTonAmount: ton("0.01"),
                         forwardPayload: emptySlice()
                     }.toCell(),
-                    mode: 64
+                    mode: SendRemainingValue
                 }
             );
         }
