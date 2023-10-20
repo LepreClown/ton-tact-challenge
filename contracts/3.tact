@@ -1,5 +1,4 @@
 import "@stdlib/deploy";
-
 /*
   TASK 3 - DEX
   Create a simple jetton dex contract that trades one pair of jettons: A and B.
@@ -95,7 +94,7 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        mode: SendRemainingValue
+                        mode: 64
                     }
                 );
                 return ;
@@ -111,7 +110,7 @@ contract Task3 with Deployable {
                             forwardTonAmount: ton("0.01"),
                             forwardPayload: emptySlice()
                         }.toCell(),
-                        mode: SendRemainingValue
+                        mode: 64
                     }
                 );
                 return ;
@@ -128,7 +127,7 @@ contract Task3 with Deployable {
                         forwardTonAmount: ton("0.01"),
                         forwardPayload: emptySlice()
                     }.toCell(),
-                    mode: SendRemainingValue
+                    mode: 64
                 }
             );
         }
