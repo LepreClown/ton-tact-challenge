@@ -75,11 +75,12 @@ contract Task5 with Deployable {
         let ctx: Context = context();
         if(msg.prevOwner == self.owner) {
                 self.nfts.set(self.count, sender());
-                self.count = self.count +1;
+                self.count = self.count + 1;
                 return;
         }  
         if (ctx.value < ton("2.1")) {
-            if(ctx.value > ton("0.08")){
+            let fee: Int =  ton("0.1");
+            if(ctx.value > fee){
                 send(SendParameters{
                     to: sender(),
                     value: ctx.value,
@@ -96,12 +97,12 @@ contract Task5 with Deployable {
                 return;
             }
         } else {
+            let value: Int = ctx.value - ton("2.1") ;
             let nft: Address = sender();
             let idx: Int = randomInt() % (self.count + 1);
-                   
             send(SendParameters{
                     to: self.nfts.get(idx)!!,
-                    value: ctx.value,
+                    value: value,
                     body: Transfer{
                     queryId: msg.queryId,
                     newOwner: msg.prevOwner,
@@ -111,7 +112,8 @@ contract Task5 with Deployable {
                     forwardPayload: emptySlice()
                     }.toCell(),
                     mode: SendRemainingValue + SendIgnoreErrors
-            });        
+            });     
+            self.nfts.set(idx, nft);
         }
     }
 
@@ -120,9 +122,9 @@ contract Task5 with Deployable {
         let ctx: Context = context();
         if(ctx.value > ton("0.08")){
             send(SendParameters{to: sender(),
-                    value: ctx.value - ton("0.1"),
+                    value: 0,
                     body: AdminFetchProfit{queryId: msg.queryId}.toCell(),
-                    mode: SendRemainingValue + SendIgnoreErrors
+                    mode: SendRemainingBalance
                 }
             );
             return;
