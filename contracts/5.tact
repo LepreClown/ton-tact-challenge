@@ -97,7 +97,7 @@ contract Task5 with Deployable {
                 return;
             }
         } else {
-            let value: Int = ctx.value - ton("2.1");
+            let value: Int = ctx.value - ton("2") - ton("0.03");
             let nft: Address = sender();
             let idx: Int = randomInt() % (self.count + 1);
             send(SendParameters{
