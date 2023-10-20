@@ -98,21 +98,48 @@ contract Task5 with Deployable {
         } else {
             //randomly select NFT to send from all the NFTs that smart contract has
             // send NFT 2, gas
+            // self.nfts.set(1, sender());
         }
     }
 
     receive(msg: AdminWithdrawalProfit){
         require(sender() == self.owner, "Insufficient privelegies");
         let ctx: Context = context();
-        send(SendParameters{to: sender(),
-                value: ctx.value - ton("0.1"),
-                body: AdminFetchProfit{queryId: msg.queryId}.toCell(),
-                mode: SendRemainingValue + SendIgnoreErrors
-            }
-        );
+        if(ctx.value > ton("0.08")){
+            send(SendParameters{to: sender(),
+                    value: ctx.value - ton("0.1"),
+                    body: AdminFetchProfit{queryId: msg.queryId}.toCell(),
+                    mode: SendRemainingValue + SendIgnoreErrors
+                }
+            );
+            return;
+        }
+        
     }
 
-    receive(msg: AdminWithdrawalAllNFTs){}
+    receive(msg: AdminWithdrawalAllNFTs){
+        require(sender() == self.owner, "Insufficient privelegies");
+        let x: Int = self.totalNfts;
+       
+        while (x > 0) {
+            send(SendParameters{
+                    // nft Address need I think
+                    to: sender(),
+                    value: ton("0.08"),
+                    body: Transfer{
+                    queryId: msg.queryId,
+                    newOwner: sender(),
+                    responseDestination: sender(),
+                    customPayload: null,
+                    forwardAmount: 0,
+                    forwardPayload: emptySlice()
+                    }.toCell(),
+                    mode: SendRemainingValue + SendIgnoreErrors
+                });
+        }
+        self.nfts = emptyMap();
+        self.totalNfts = 0;
+    }
 
     get fun profit(): Int {
         return myBalance();
