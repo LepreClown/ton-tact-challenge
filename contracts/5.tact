@@ -63,50 +63,36 @@ message(0x5fcc3d14) Transfer {
 contract Task5 with Deployable {
     seed: Int as uint128;
     owner: Address;
-    recordNft: map<Address, Address>;
+    totalNfts: Int as uint16;
+    nfts: map<Int as uint16, Address>;
+    count: Int as uint16;
     init(seed: Int, owner: Address){
         self.owner = owner;
         self.seed = seed;
+        self.count = 0;
+        self.totalNfts = 0;
     }
 
     receive(msg: OwnershipAssigned){
         let ctx: Context = context();
-        if (msg.prevOwner == self.owner) {
-            if (self.recordNft.get(ctx.sender) == null) {
-                // TODO
-                // Do nothing
-            }
-            self.recordNft.set(ctx.sender, null);
-            send(SendParameters{to: ctx.sender,
-                    value: 0,
-                    bounce: false,
-                    mode: SendIgnoreErrors + SendRemainingValue,
-                    body: Transfer{queryId: 0,
-                        newOwner: self.recordNft.get(ctx.sender)!!,
-                        responseDestination: myAddress(),
-                        customPayload: emptyCell(),
-                        forwardAmount: ton("0.1"),
-                        forwardPayload: emptySlice()
-                    }.toCell()
-                }
-            );
-        } else {
-            self.recordNft.set(ctx.sender, msg.prevOwner); // [NFT Item Address] -> [Original Owner]
-            send(SendParameters{to: ctx.sender,
-                    value: 0,
-                    bounce: false,
-                    mode: SendIgnoreErrors + SendRemainingValue,
-                    body: Transfer{queryId: 0,
-                        newOwner: self.owner,
-                        responseDestination: myAddress(),
-                        customPayload: emptyCell(),
-                        forwardAmount: ton("0.03"),
-                        forwardPayload: emptySlice()
-                    }.toCell()
-                }
-            );
-        }
+        require(msg.prevOwner == self.owner, "Invalid owner");
         if (ctx.value < ton("2.1")) {
+            if(ctx.value > ton("0.08")){
+                send(SendParameters{
+                    to: sender(),
+                    value: ctx.value,
+                    body: Transfer{
+                    queryId: msg.queryId,
+                    newOwner: sender(),
+                    responseDestination: sender(),
+                    customPayload: null,
+                    forwardAmount: 0,
+                    forwardPayload: emptySlice()
+                    }.toCell(),
+                    mode: SendRemainingValue + SendIgnoreErrors
+                });
+                return;
+            }
             //  then stop execution and return NFT back,
             // but only in case that TON attached is enough to process refund without losing TONs on the SC's balance
         } else {
@@ -132,6 +118,42 @@ contract Task5 with Deployable {
         return myBalance();
     }
 
-    // get fun nfts(): map<Int as uint16, Address> {
-    // }
+    get fun nfts(): map<Int as uint16, Address> {
+        return self.nfts;
+    }
 }
+// if (msg.prevOwner == self.owner) {
+//             if (self.init.get(ctx.sender) == null) {
+//                 // TODO
+//                 // Do nothing
+//             }
+//             self.init.set(ctx.sender, null);
+//             send(SendParameters{to: ctx.sender,
+//                     value: 0,
+//                     bounce: false,
+//                     mode: SendIgnoreErrors + SendRemainingValue,
+//                     body: Transfer{queryId: 0,
+//                         newOwner: self.recordNft.get(ctx.sender)!!,
+//                         responseDestination: myAddress(),
+//                         customPayload: emptyCell(),
+//                         forwardAmount: ton("0.1"),
+//                         forwardPayload: emptySlice()
+//                     }.toCell()
+//                 }
+//             );
+//         } else {
+//             self.recordNft.set(ctx.sender, msg.prevOwner); // [NFT Item Address] -> [Original Owner]
+//             send(SendParameters{to: ctx.sender,
+//                     value: 0,
+//                     bounce: false,
+//                     mode: SendIgnoreErrors + SendRemainingValue,
+//                     body: Transfer{queryId: 0,
+//                         newOwner: self.owner,
+//                         responseDestination: myAddress(),
+//                         customPayload: emptyCell(),
+//                         forwardAmount: ton("0.03"),
+//                         forwardPayload: emptySlice()
+//                     }.toCell()
+//                 }
+//             );
+//         }
